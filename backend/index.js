@@ -1,6 +1,7 @@
 const express = require("express");
 const userRouter = require("./routers/userRouter.js");
 const cors = require("cors");
+const postRouter = require("./routers/postRouter.js");
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/user", userRouter);
+app.use("/api/post", postRouter);
 
 app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message });

@@ -1,18 +1,30 @@
-const http = require("http");
+const express = require("express");
+const userRouter = require("./routers/userRouter.js");
+const cors = require("cors");
 
-const PORT = process.env.PORT || 3000;
+const app = express();
 
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { "Content-Type": "application/json" });
-  res.end(
-    JSON.stringify({
-      message: "TeknoTwit backend is up and running",
-      method: req.method,
-      path: req.url,
-    })
+
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
   );
+  next();
 });
 
-server.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use("/api/user", userRouter);
+
+app.use((err, req, res, next) => {
+  res.status(500).send({ message: err.message });
+});
+
+const port = 3000;
+app.listen(port, () => {
+  console.log(`Serve at http://localhost:${port}`);
 });

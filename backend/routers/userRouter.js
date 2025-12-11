@@ -1,5 +1,9 @@
 const express = require("express");
-const { getUsers } = require("../controller/userController");
+const { 
+    getUsers, 
+    getUser, 
+    getUserByUsername 
+  } = require("../controller/userController");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
@@ -39,9 +43,7 @@ exports.getUser = async (req, res) => {
 // userRouter.get("/:id", getUser);
 userRouter.get("/:id", getUserById);
 
-
 // get user by username
-
-// userRouter.get("/username/:username", getUserByUsername);
+userRouter.get("/username/:username", getUserByUsername);
 
 module.exports = userRouter;

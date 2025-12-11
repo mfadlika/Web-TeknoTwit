@@ -37,8 +37,11 @@ exports.getUser = async (req, res) => {
   };
 
 // userRouter.get("/:id", getUser);
+userRouter.get("/:id", getUserById);
+
 
 // get user by username
+
 // userRouter.get("/username/:username", getUserByUsername);
 
 module.exports = userRouter;

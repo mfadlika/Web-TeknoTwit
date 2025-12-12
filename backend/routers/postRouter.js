@@ -1,17 +1,23 @@
 const express = require("express");
-const { getPosts } = require("../controller/postController");
+const { 
+  getPosts,
+  getPost,
+  getPostsByUser,
+  createPost
+} = require("../controller/postController");
 
 const postRouter = express.Router();
 
+// Get posts by user
+postRouter.get("/user/:userId", getPostsByUser);
+
+// Get post by id
+postRouter.get("/:id", getPost);
+
+// Get all posts
 postRouter.get("/", getPosts);
 
-// get post by id
-// postRouter.get("/:id", getPost);
-
-// get posts by user id
-// postRouter.get("/user/:userId", getPostsByUser);
-
-// create a new post
-// postRouter.post("/", createPost);
+// Create post
+postRouter.post("/", createPost);
 
 module.exports = postRouter;

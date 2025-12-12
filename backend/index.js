@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config();
 const userRouter = require("./routers/userRouter.js");
 const cors = require("cors");
 const postRouter = require("./routers/postRouter.js");

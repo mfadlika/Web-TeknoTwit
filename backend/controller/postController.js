@@ -45,3 +45,29 @@ exports.getPostsByUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// CREATE new post
+exports.createPost = async (req, res) => {
+  try {
+    const { title, content, userId } = req.body;
+
+    if (!title || !content || !userId) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const post = await prisma.post.create({
+      data: {
+        title,
+        content,
+        userId: Number(userId),
+      },
+    });
+
+    res.json({
+      message: "Post created successfully",
+      post,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

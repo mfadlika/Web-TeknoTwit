@@ -36,6 +36,12 @@ exports.postSignUp = async (req, res) => {
         .json({ message: "Name, email and password are required" });
     }
 
+    // only allow teknokrat.ac.id emails
+    const allowedDomain = "@teknokrat.ac.id";
+    if (!String(email).toLowerCase().endsWith(allowedDomain)) {
+      return res.status(400).json({ message: `Only ${allowedDomain} emails are allowed` });
+    }
+
     if (typeof password === "string" && password.length > 20) {
       return res
         .status(400)

@@ -18,6 +18,13 @@ export default function SignupPage() {
       return;
     }
 
+    // Client-side domain validation for better UX
+    const allowedDomain = "@teknokrat.ac.id";
+    if (!String(email).toLowerCase().endsWith(allowedDomain)) {
+      setError(`Hanya email ${allowedDomain} yang dapat mendaftar`);
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch("http://localhost:3000/api/user/signup", {

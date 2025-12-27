@@ -1,13 +1,15 @@
-const {Prisma } = require('@prisma/client');
-const prisma = new Prisma.Client();
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 // User login controller
-exports.loginUser = async (req, res) => {
+exports.postLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
     }
 
     const user = await prisma.user.findUnique({
@@ -22,7 +24,7 @@ exports.loginUser = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-}
+};
 //         content,
 //         userId,
 //       },

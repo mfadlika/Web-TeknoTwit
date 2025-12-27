@@ -4,7 +4,7 @@ const {
   getUser,
   getUserByUsername,
 } = require("../controller/userController");
-const { postLogin } = require("../controller/loginController");
+const { postLogin, postSignUp } = require("../controller/loginController");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
@@ -18,7 +18,7 @@ userRouter.get("/username/:username", getUserByUsername);
 // userRouter.get("/:id", getUser);
 userRouter.get("/:id", getUser);
 
-// userRouter.post("/signup", postSignUp);
+userRouter.post("/signup", postSignUp);
 
 userRouter.post("/login", postLogin);
 

@@ -142,8 +142,16 @@ export default function HomePage() {
                 setError(null);
                 try {
                   const title = content.split("\n")[0].slice(0, 60) || "Post";
-                  const body = { title, content, userId: 1 };
-                  const res = await axios.post(`${API_BASE}/post`, body);
+                  const body = { title, content };
+                  const token = localStorage.getItem("token");
+                  if (!token) {
+                    setError("Silakan login untuk membuat post.");
+                    setPosting(false);
+                    return;
+                  }
+                  const res = await axios.post(`${API_BASE}/post`, body, {
+                    headers: { Authorization: `Bearer ${token}` },
+                  });
                   // API returns { message, post }
                   const created =
                     res.data && res.data.post ? res.data.post : null;
@@ -174,8 +182,17 @@ export default function HomePage() {
                   }
                   setNewContent("");
                 } catch (err) {
-                  console.error("Post failed", err.message);
-                  setError("Gagal membuat post. Coba lagi.");
+                  console.error("Post failed", err);
+                  if (err.response && err.response.status === 401) {
+                    setError(
+                      "Token tidak valid atau kadaluarsa. Silakan login ulang."
+                    );
+                    // remove invalid token
+                    localStorage.removeItem("token");
+                    window.dispatchEvent(new Event("app:auth-changed"));
+                  } else {
+                    setError("Gagal membuat post. Coba lagi.");
+                  }
                 } finally {
                   setPosting(false);
                 }

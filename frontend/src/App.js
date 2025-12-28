@@ -9,6 +9,7 @@ import {
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import HomePage from "./pages/HomePage";
+import UserPage from "./pages/UserPage";
 
 function NavBar() {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ function NavBar() {
       <Link to="/" style={{ marginRight: 12 }}>
         Home
       </Link>
+
       {token ? (
         <button
           onClick={handleLogout}
@@ -58,6 +60,7 @@ function App() {
 
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/user/:id" element={<UserPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
       </Routes>

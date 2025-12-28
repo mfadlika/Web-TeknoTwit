@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 function generateMockPosts(count = 6) {
@@ -49,13 +50,34 @@ function PostCard({ post }) {
     fontWeight: 700,
   };
 
+  const userId =
+    post.user?.id ||
+    post.userId ||
+    post.author?.id ||
+    post.author?.userId ||
+    null;
+
   return (
     <div style={cardStyle}>
       <div style={{ display: "flex", gap: 12 }}>
-        <div style={avatarStyle}>{post.author.name.charAt(0)}</div>
+        <div style={avatarStyle}>
+          {(post.author && post.author.name && post.author.name.charAt(0)) ||
+            "U"}
+        </div>
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-            <div style={{ fontWeight: 700 }}>{post.author.name}</div>
+            <div style={{ fontWeight: 700 }}>
+              {userId ? (
+                <Link
+                  to={`/user/${userId}`}
+                  style={{ color: "inherit", textDecoration: "none" }}
+                >
+                  {post.author.name}
+                </Link>
+              ) : (
+                post.author.name
+              )}
+            </div>
             <div style={{ color: "#999", fontSize: 12 }}>
               • {new Date(post.createdAt).toLocaleString()}
             </div>

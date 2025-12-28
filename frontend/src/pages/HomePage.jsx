@@ -56,9 +56,6 @@ function PostCard({ post }) {
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
             <div style={{ fontWeight: 700 }}>{post.author.name}</div>
-            <div style={{ color: "#666", fontSize: 13 }}>
-              @{post.author.handle}
-            </div>
             <div style={{ color: "#999", fontSize: 12 }}>
               • {new Date(post.createdAt).toLocaleString()}
             </div>
@@ -92,7 +89,9 @@ export default function HomePage() {
         if (!mounted) return;
         const apiPosts = (res.data || []).map((p) => ({
           id: p.id || `post_${Math.random()}`,
-          author: { name: `User ${p.userId}`, handle: `user${p.userId}` },
+          author: {
+            name: p.userName || (p.user && p.user.name) || `User ${p.userId}`,
+          },
           content: p.content,
           createdAt: p.createdAt || p.created_at || new Date().toISOString(),
           likes: p.likes || 0,
@@ -152,8 +151,10 @@ export default function HomePage() {
                     const mapped = {
                       id: created.id || `local_${Date.now()}`,
                       author: {
-                        name: `User ${created.userId}`,
-                        handle: `user${created.userId}`,
+                        name:
+                          created.userName ||
+                          (created.user && created.user.name) ||
+                          `User ${created.userId}`,
                       },
                       content: created.content,
                       createdAt: created.createdAt || new Date().toISOString(),
@@ -164,7 +165,7 @@ export default function HomePage() {
                     // fallback optimistic insert
                     const newPost = {
                       id: `local_${Date.now()}`,
-                      author: { name: "Kamu", handle: "you" },
+                      author: { name: "Kamu" },
                       content,
                       createdAt: new Date().toISOString(),
                       likes: 0,

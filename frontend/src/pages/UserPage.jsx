@@ -51,6 +51,7 @@ function PostCard({ post }) {
 export default function UserPage() {
   const { id } = useParams();
   const [posts, setPosts] = useState([]);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -63,12 +64,18 @@ export default function UserPage() {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get(`${API_BASE}/post/user/${id}`);
+        // fetch user and posts in parallel
+        const [userRes, postsRes] = await Promise.all([
+          axios.get(`${API_BASE}/user/${id}`),
+          axios.get(`${API_BASE}/post/user/${id}`),
+        ]);
+
         if (!mounted) return;
-        setPosts(res.data || []);
+        setUser(userRes.data || null);
+        setPosts(postsRes.data || []);
       } catch (err) {
         console.error(err);
-        if (mounted) setError("Gagal memuat post user.");
+        if (mounted) setError("Gagal memuat data user.");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -94,6 +101,41 @@ export default function UserPage() {
 
       {loading && <div>Loading...</div>}
       {error && <div style={{ color: "#b00020" }}>{error}</div>}
+
+      {user && (
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            alignItems: "center",
+            marginBottom: 12,
+          }}
+        >
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: 64,
+              background: "#1976d2",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 28,
+              fontWeight: 700,
+            }}
+          >
+            {user.name ? user.name.charAt(0) : "U"}
+          </div>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 700 }}>{user.name}</div>
+            <div style={{ color: "#666", fontSize: 13 }}>{user.email}</div>
+            <div style={{ color: "#666", fontSize: 13, marginTop: 6 }}>
+              {posts.length} postingan
+            </div>
+          </div>
+        </div>
+      )}
 
       {!loading && !error && posts.length === 0 && (
         <div>Belum ada postingan.</div>

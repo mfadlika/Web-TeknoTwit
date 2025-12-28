@@ -2,33 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-function generateMockPosts(count = 6) {
-  const authors = [
-    { name: "Ayu Santoso", handle: "ayu" },
-    { name: "Rizal H", handle: "rizal" },
-    { name: "Maya", handle: "maya_dev" },
-    { name: "Budi", handle: "budi" },
-  ];
-
-  const contents = [
-    "Hai dunia! Ini postingan pertama saya.",
-    "Belajar React itu menyenangkan.",
-    "Cuaca hari ini cerah, semoga produktif!",
-    "Baru saja menyelesaikan tantangan coding.",
-    "Ini contoh konten post yang di-generate lokal.",
-  ];
-
-  const now = Date.now();
-
-  return Array.from({ length: count }).map((_, i) => ({
-    id: `post_${i + 1}`,
-    author: authors[i % authors.length],
-    content: contents[i % contents.length],
-    createdAt: new Date(now - i * 1000 * 60 * 60).toISOString(),
-    likes: Math.floor(Math.random() * 120),
-  }));
-}
-
 function PostCard({ post }) {
   const cardStyle = {
     padding: 12,
@@ -119,14 +92,12 @@ export default function HomePage() {
           likes: p.likes || 0,
         }));
         if (apiPosts.length) setPosts(apiPosts.reverse());
-        else setPosts(generateMockPosts(8));
       })
       .catch((err) => {
         console.warn(
           "Failed to load posts from API, using mock posts",
           err.message
         );
-        if (mounted) setPosts(generateMockPosts(8));
       })
       .finally(() => mounted && setLoading(false));
 

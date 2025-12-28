@@ -33,8 +33,13 @@ export default function LoginPage() {
       }
 
       setSuccess("Login berhasil");
-      // store user id for later use
+      // store user id and token for later use
       if (data.userId) localStorage.setItem("userId", data.userId);
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        // notify app about auth change
+        window.dispatchEvent(new Event("app:auth-changed"));
+      }
 
       // small delay so user sees success message
       setTimeout(() => {

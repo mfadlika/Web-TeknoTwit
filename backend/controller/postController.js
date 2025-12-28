@@ -5,7 +5,21 @@ const prisma = new PrismaClient();
 exports.getPosts = async (req, res) => {
   try {
     const posts = await prisma.post.findMany();
-    res.json(posts);
+
+    // fetch users for posts to include user name
+    const userIds = Array.from(new Set(posts.map((p) => p.userId).filter(Boolean)));
+    let users = [];
+    if (userIds.length) {
+      users = await prisma.user.findMany({ where: { id: { in: userIds } } });
+    }
+    const usersById = Object.fromEntries(users.map((u) => [u.id, u]));
+
+    const postsWithUser = posts.map((p) => ({
+      ...p,
+      user: usersById[p.userId] || null,
+    }));
+
+    res.json(postsWithUser);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -24,7 +38,9 @@ exports.getPost = async (req, res) => {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    res.json(post);
+    // attach user
+    const user = await prisma.user.findUnique({ where: { id: post.userId } });
+    res.json({ ...post, user });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -39,7 +55,11 @@ exports.getPostsByUser = async (req, res) => {
       where: { userId },
     });
 
-    res.json(posts);
+    // attach user info (single user)
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const postsWithUser = posts.map((p) => ({ ...p, user }));
+
+    res.json(postsWithUser);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -68,9 +88,12 @@ exports.createPost = async (req, res) => {
       },
     });
 
+    // attach user to response
+    const user = await prisma.user.findUnique({ where: { id: Number(userId) } });
+
     res.json({
       message: "Post created successfully",
-      post,
+      post: { ...post, user },
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

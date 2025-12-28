@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 function generateMockPosts(count = 6) {
   const authors = [
@@ -75,10 +76,42 @@ function PostCard({ post }) {
 export default function HomePage() {
   const [posts, setPosts] = useState([]);
   const [newContent, setNewContent] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [posting, setPosting] = useState(false);
+  const [error, setError] = useState(null);
+
+  const API_BASE =
+    process.env.REACT_APP_API_BASE || "http://localhost:3000/api";
 
   useEffect(() => {
-    const data = generateMockPosts(8);
-    setPosts(data);
+    let mounted = true;
+    setLoading(true);
+    axios
+      .get(`${API_BASE}/post`)
+      .then((res) => {
+        if (!mounted) return;
+        const apiPosts = (res.data || []).map((p) => ({
+          id: p.id || `post_${Math.random()}`,
+          author: { name: `User ${p.userId}`, handle: `user${p.userId}` },
+          content: p.content,
+          createdAt: p.createdAt || p.created_at || new Date().toISOString(),
+          likes: p.likes || 0,
+        }));
+        if (apiPosts.length) setPosts(apiPosts.reverse());
+        else setPosts(generateMockPosts(8));
+      })
+      .catch((err) => {
+        console.warn(
+          "Failed to load posts from API, using mock posts",
+          err.message
+        );
+        if (mounted) setPosts(generateMockPosts(8));
+      })
+      .finally(() => mounted && setLoading(false));
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   return (
@@ -103,31 +136,62 @@ export default function HomePage() {
           />
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <button
-              onClick={() => {
+              onClick={async () => {
                 const content = newContent.trim();
                 if (!content) return;
-                const newPost = {
-                  id: `local_${Date.now()}`,
-                  author: { name: "Kamu", handle: "you" },
-                  content,
-                  createdAt: new Date().toISOString(),
-                  likes: 0,
-                };
-                setPosts((prev) => [newPost, ...prev]);
-                setNewContent("");
+                setPosting(true);
+                setError(null);
+                try {
+                  const title = content.split("\n")[0].slice(0, 60) || "Post";
+                  const body = { title, content, userId: 1 };
+                  const res = await axios.post(`${API_BASE}/post`, body);
+                  // API returns { message, post }
+                  const created =
+                    res.data && res.data.post ? res.data.post : null;
+                  if (created) {
+                    const mapped = {
+                      id: created.id || `local_${Date.now()}`,
+                      author: {
+                        name: `User ${created.userId}`,
+                        handle: `user${created.userId}`,
+                      },
+                      content: created.content,
+                      createdAt: created.createdAt || new Date().toISOString(),
+                      likes: created.likes || 0,
+                    };
+                    setPosts((prev) => [mapped, ...prev]);
+                  } else {
+                    // fallback optimistic insert
+                    const newPost = {
+                      id: `local_${Date.now()}`,
+                      author: { name: "Kamu", handle: "you" },
+                      content,
+                      createdAt: new Date().toISOString(),
+                      likes: 0,
+                    };
+                    setPosts((prev) => [newPost, ...prev]);
+                  }
+                  setNewContent("");
+                } catch (err) {
+                  console.error("Post failed", err.message);
+                  setError("Gagal membuat post. Coba lagi.");
+                } finally {
+                  setPosting(false);
+                }
               }}
-              disabled={!newContent.trim()}
+              disabled={!newContent.trim() || posting}
               style={{
                 padding: "8px 12px",
                 borderRadius: 8,
                 border: "none",
-                background: "#1976d2",
+                background: posting ? "#9bbce8" : "#1976d2",
                 color: "#fff",
-                cursor: newContent.trim() ? "pointer" : "not-allowed",
+                cursor:
+                  newContent.trim() && !posting ? "pointer" : "not-allowed",
                 fontWeight: 700,
               }}
             >
-              Post
+              {posting ? "Posting..." : "Post"}
             </button>
           </div>
         </div>

@@ -7,7 +7,9 @@ exports.getPosts = async (req, res) => {
     const posts = await prisma.post.findMany();
 
     // fetch users for posts to include user name
-    const userIds = Array.from(new Set(posts.map((p) => p.userId).filter(Boolean)));
+    const userIds = Array.from(
+      new Set(posts.map((p) => p.userId).filter(Boolean))
+    );
     let users = [];
     if (userIds.length) {
       users = await prisma.user.findMany({ where: { id: { in: userIds } } });
@@ -89,7 +91,9 @@ exports.createPost = async (req, res) => {
     });
 
     // attach user to response
-    const user = await prisma.user.findUnique({ where: { id: Number(userId) } });
+    const user = await prisma.user.findUnique({
+      where: { id: Number(userId) },
+    });
 
     res.json({
       message: "Post created successfully",

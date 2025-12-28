@@ -40,16 +40,12 @@ function PostCard({ post }) {
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
             <div style={{ fontWeight: 700 }}>
-              {userId ? (
-                <Link
-                  to={`/user/${userId}`}
-                  style={{ color: "inherit", textDecoration: "none" }}
-                >
-                  {post.author.name}
-                </Link>
-              ) : (
-                post.author.name
-              )}
+              <Link
+                to={`/user/${userId}`}
+                style={{ color: "inherit", textDecoration: "none" }}
+              >
+                {post.author.name}
+              </Link>
             </div>
             <div style={{ color: "#999", fontSize: 12 }}>
               • {new Date(post.createdAt).toLocaleString()}
@@ -84,9 +80,14 @@ export default function HomePage() {
         if (!mounted) return;
         const apiPosts = (res.data || []).map((p) => ({
           id: p.id || `post_${Math.random()}`,
+          // include author name and id so links work
           author: {
             name: p.userName || (p.user && p.user.name) || `User ${p.userId}`,
+            id: (p.user && p.user.id) || p.userId || null,
           },
+          // preserve raw user object (if backend provided)
+          user: p.user || null,
+          userId: (p.user && p.user.id) || p.userId || null,
           content: p.content,
           createdAt: p.createdAt || p.created_at || new Date().toISOString(),
           likes: p.likes || 0,
@@ -156,7 +157,16 @@ export default function HomePage() {
                           created.userName ||
                           (created.user && created.user.name) ||
                           `User ${created.userId}`,
+                        id:
+                          (created.user && created.user.id) ||
+                          created.userId ||
+                          null,
                       },
+                      user: created.user || null,
+                      userId:
+                        (created.user && created.user.id) ||
+                        created.userId ||
+                        null,
                       content: created.content,
                       createdAt: created.createdAt || new Date().toISOString(),
                       likes: created.likes || 0,
@@ -166,7 +176,12 @@ export default function HomePage() {
                     // fallback optimistic insert
                     const newPost = {
                       id: `local_${Date.now()}`,
-                      author: { name: "Kamu" },
+                      author: {
+                        name: "Kamu",
+                        id: Number(localStorage.getItem("userId")) || null,
+                      },
+                      user: null,
+                      userId: Number(localStorage.getItem("userId")) || null,
                       content,
                       createdAt: new Date().toISOString(),
                       likes: 0,

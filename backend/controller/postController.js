@@ -90,14 +90,15 @@ exports.createPost = async (req, res) => {
       },
     });
 
-    // attach user to response
     const user = await prisma.user.findUnique({
       where: { id: Number(userId) },
     });
 
+
     res.json({
       message: "Post created successfully",
       post: { ...post, user },
+      postId: post.id,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

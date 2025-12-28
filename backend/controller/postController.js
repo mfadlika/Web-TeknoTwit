@@ -30,7 +30,6 @@ exports.getPost = async (req, res) => {
   }
 };
 
-
 // GET posts by user ID
 exports.getPostsByUser = async (req, res) => {
   try {
@@ -46,13 +45,19 @@ exports.getPostsByUser = async (req, res) => {
   }
 };
 
-// CREATE new post
+// CREATE new post (authenticated)
 exports.createPost = async (req, res) => {
   try {
-    const { title, content, userId } = req.body;
+    const { title, content } = req.body;
+    // prefer authenticated user id from middleware
+    const authUserId = req.user && req.user.id ? Number(req.user.id) : null;
+    const bodyUserId = req.body.userId ? Number(req.body.userId) : null;
+    const userId = authUserId || bodyUserId;
 
     if (!title || !content || !userId) {
-      return res.status(400).json({ message: "Missing required fields" });
+      return res
+        .status(400)
+        .json({ message: "Missing required fields or unauthorized" });
     }
 
     const post = await prisma.post.create({

@@ -1,5 +1,8 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const jwt = require("jsonwebtoken");
+
+const SECRET = process.env.JWT_SECRET || "dev_secret";
 
 // User login controller
 exports.postLogin = async (req, res) => {
@@ -20,7 +23,16 @@ exports.postLogin = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    res.json({ message: "Login successful", userId: user.id });
+    // sign a JWT containing minimal user info
+    const token = jwt.sign(
+      { id: user.id, name: user.name, email: user.email },
+      SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    res.json({ message: "Login successful", userId: user.id, token });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

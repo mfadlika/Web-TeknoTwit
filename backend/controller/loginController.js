@@ -81,3 +81,7 @@ exports.postSignUp = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.postLogout = async (req, res) => {
+  res.json({ message: "Logout successful" });
+};

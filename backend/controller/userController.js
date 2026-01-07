@@ -48,3 +48,18 @@ exports.getUserByUsername = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// Get user by ID delete user
+exports.deleteUser = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+
+    const deletedUser = await prisma.user.delete({
+      where: { id },
+    });
+
+    res.json(deletedUser);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

@@ -4,6 +4,7 @@ require("dotenv").config({ path: path.join(__dirname, ".env") });
 const userRouter = require("./routers/userRouter.js");
 const cors = require("cors");
 const postRouter = require("./routers/postRouter.js");
+const friendRouter = require("./routers/friendRouter.js");
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/user", userRouter);
 app.use("/api/post", postRouter);
+app.use("/api/friend", friendRouter);
 
 app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message });

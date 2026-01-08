@@ -106,7 +106,7 @@ exports.createPost = async (req, res) => {
 };
 
 //  Create Picture Post (authenticated)
-exports.createPostpicture = async (req, res) => {
+exports.createPosture = async (req, res) => {
   try {
     const { title, content, imageUrl } = req.body;
     // prefer authenticated user id from middleware
@@ -137,6 +137,73 @@ exports.createPostpicture = async (req, res) => {
       post: { ...post, user },
       postId: post.id,
     });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.createPostpicture = exports.createPosture;
+
+// Repost a post (authenticated)
+exports.repostPost = async (req, res) => {
+  try {
+    const postId = Number(req.params.id);
+    const userId = req.user && req.user.id ? Number(req.user.id) : null;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    if (!postId) {
+      return res.status(400).json({ message: "Invalid post id" });
+    }
+
+    const post = await prisma.post.findUnique({ where: { id: postId } });
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    const existing = await prisma.repost.findUnique({
+      where: { userId_postId: { userId, postId } },
+    });
+    if (existing) {
+      return res.status(409).json({ message: "Already reposted" });
+    }
+
+    const repost = await prisma.repost.create({
+      data: { userId, postId },
+    });
+
+    res.status(201).json({ message: "Reposted", repost });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Undo repost (authenticated)
+exports.unrepostPost = async (req, res) => {
+  try {
+    const postId = Number(req.params.id);
+    const userId = req.user && req.user.id ? Number(req.user.id) : null;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    if (!postId) {
+      return res.status(400).json({ message: "Invalid post id" });
+    }
+
+    const existing = await prisma.repost.findUnique({
+      where: { userId_postId: { userId, postId } },
+    });
+    if (!existing) {
+      return res.status(404).json({ message: "Repost not found" });
+    }
+
+    await prisma.repost.delete({
+      where: { userId_postId: { userId, postId } },
+    });
+
+    res.json({ message: "Repost removed" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

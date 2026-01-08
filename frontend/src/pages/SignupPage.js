@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -13,8 +14,16 @@ export default function SignupPage() {
     setError(null);
     setSuccess(null);
 
-    if (!name || !email || !password) {
-      setError("Name, email, and password are required");
+    if (!name || !username || !email || !password) {
+      setError("Name, username, email, and password are required");
+      return;
+    }
+
+    const usernamePattern = /^[a-zA-Z0-9_]{3,20}$/;
+    if (!usernamePattern.test(String(username).trim())) {
+      setError(
+        "Username must be 3-20 characters and contain only letters, numbers, or underscore"
+      );
       return;
     }
 
@@ -25,12 +34,17 @@ export default function SignupPage() {
       return;
     }
 
+    if (!/\d/.test(String(password))) {
+      setError("Password harus mengandung minimal 1 angka");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch("http://localhost:3000/api/user/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, username, email, password }),
       });
 
       const data = await res.json();
@@ -64,6 +78,17 @@ export default function SignupPage() {
             onChange={(e) => setName(e.target.value)}
             style={{ width: "100%", padding: 8 }}
             placeholder="Nama lengkap"
+          />
+        </div>
+
+        <div style={{ marginBottom: 12 }}>
+          <label style={{ display: "block", marginBottom: 6 }}>Username</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            style={{ width: "100%", padding: 8 }}
+            placeholder="username anda"
           />
         </div>
 

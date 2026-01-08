@@ -6,6 +6,7 @@ const cors = require("cors");
 const postRouter = require("./routers/postRouter.js");
 const friendRouter = require("./routers/friendRouter.js");
 const shareRouter = require("./routers/shareRouter.js");
+const followRouter = require("./routers/followRouter.js");
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use("/api/user", userRouter);
 app.use("/api/post", postRouter);
 app.use("/api/friend", friendRouter);
 app.use("/api/share", shareRouter);
+app.use("/api/follow", followRouter);
 
 app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message });

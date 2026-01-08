@@ -25,6 +25,8 @@ model User {
   messagesReceived Message[] @relation("MessageReceiver")
   reposts          Repost[]
   likes            Like[]
+  following        Follow[] @relation("UserFollowing")
+  followers        Follow[] @relation("UserFollowers")
 }
 
 model Post {
@@ -100,4 +102,17 @@ model Like {
 
   @@unique([userId, postId])
   @@index([postId])
+}
+
+model Follow {
+  id          Int      @id @default(autoincrement())
+  followerId  Int
+  followingId Int
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("UserFollowing", fields: [followerId], references: [id])
+  following User @relation("UserFollowers", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
+  @@index([followingId])
 }

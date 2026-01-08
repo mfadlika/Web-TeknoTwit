@@ -51,3 +51,23 @@ exports.updateProfile = async (req, res) => {
 };
 
 // DELETE profile (authenticated)
+exports.deleteProfile = async (req, res) => {
+  try {
+    const authUserId = req.user && req.user.id ? Number(req.user.id) : null;
+    const userId = parseInt(req.params.userId);
+
+    if (authUserId !== userId) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const deletedUser = await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    res.json({ message: "User deleted", user: deletedUser });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET authenticated user's profile

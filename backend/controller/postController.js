@@ -105,4 +105,39 @@ exports.createPost = async (req, res) => {
   }
 };
 
+//  Create Picture Post (authenticated)
+exports.createPostpicture = async (req, res) => {
+  try {
+    const { title, content, imageUrl } = req.body;
+    // prefer authenticated user id from middleware
+    const authUserId = req.user && req.user.id ? Number(req.user.id) : null;
+    const bodyUserId = req.body.userId ? Number(req.body.userId) : null;
+    const userId = authUserId || bodyUserId;
 
+    if (!title || !content || !imageUrl || !userId) {
+      return res
+        .status(400)
+        .json({ message: "Missing required fields or unauthorized" });
+    }
+
+    const post = await prisma.post.create({
+      data: {
+        title,
+        content,
+        imageUrl,
+        userId: Number(userId),
+      },
+    });
+
+    const user = await prisma.user.findUnique({
+      where: { id: Number(userId) },
+    });
+    res.json({
+      message: "Picture Post created successfully",
+      post: { ...post, user },
+      postId: post.id,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

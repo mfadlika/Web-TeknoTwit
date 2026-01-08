@@ -4,7 +4,9 @@ const prisma = new PrismaClient();
 // GET all posts
 exports.getPosts = async (req, res) => {
   try {
-    const posts = await prisma.post.findMany();
+    const posts = await prisma.post.findMany({
+      orderBy: { createdAt: "desc" },
+    });
 
     // fetch users for posts to include user name
     const userIds = Array.from(
@@ -55,6 +57,7 @@ exports.getPostsByUser = async (req, res) => {
 
     const posts = await prisma.post.findMany({
       where: { userId },
+      orderBy: { createdAt: "desc" },
     });
 
     // attach user info (single user)

@@ -1,6 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+// GET profile by userId
 exports.getProfile = async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
@@ -25,3 +26,28 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// PUT update profile (authenticated)
+exports.updateProfile = async (req, res) => {
+    try {
+        const authUserId = req.user && req.user.id ? Number(req.user.id) : null;
+        const userId = parseInt(req.params.userId);
+        
+        if (authUserId !== userId) {
+            return res.status(403).json({ message: "Forbidden" });
+        }
+        const { bio, avatarUrl } = req.body;
+        
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: { bio, avatarUrl },
+        });
+        
+        res.json(updatedUser);
+    } catch (err) {
+        res.status(500).json({ error: err.message });   
+      
+    }
+};
+
+// DELETE profile (authenticated)

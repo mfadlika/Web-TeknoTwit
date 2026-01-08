@@ -5,6 +5,8 @@ const {
   getPostsByUser,
   createPost,
   createPosture,
+  repostPost,
+  unrepostPost,
 } = require("../controller/postController");
 
 const postRouter = express.Router();
@@ -27,5 +29,9 @@ postRouter.post("/picture", auth, createPostpicture);
 
 // create like route here in the future
 postRouter.post("/:id/like", getPost);
+
+// repost routes
+postRouter.post("/:id/repost", auth, repostPost);
+postRouter.delete("/:id/repost", auth, unrepostPost);
 
 module.exports = postRouter;

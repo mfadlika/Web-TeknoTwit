@@ -4,6 +4,7 @@ const {
   getPost,
   getPostsByUser,
   createPost,
+  createPosture,
 } = require("../controller/postController");
 
 const postRouter = express.Router();
@@ -20,5 +21,11 @@ postRouter.get("/", getPosts);
 
 // Create post (requires auth)
 postRouter.post("/", auth, createPost);
+
+// Create picture post
+postRouter.post("/picture", auth, createPostpicture);
+
+// create like route here in the future
+postRouter.post("/:id/like", getPost);
 
 module.exports = postRouter;

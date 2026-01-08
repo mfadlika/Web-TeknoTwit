@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -12,8 +12,8 @@ export default function LoginPage() {
     setError(null);
     setSuccess(null);
 
-    if (!email || !password) {
-      setError("Email dan password wajib diisi");
+    if (!username || !password) {
+      setError("Username dan password wajib diisi");
       return;
     }
 
@@ -22,7 +22,7 @@ export default function LoginPage() {
       const res = await fetch("http://localhost:3000/api/user/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await res.json();
@@ -57,13 +57,13 @@ export default function LoginPage() {
       <h2>Masuk</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: 12 }}>
-          <label style={{ display: "block", marginBottom: 6 }}>Email</label>
+          <label style={{ display: "block", marginBottom: 6 }}>Username</label>
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             style={{ width: "100%", padding: 8 }}
-            placeholder="you@example.com"
+            placeholder="username anda"
           />
         </div>
 

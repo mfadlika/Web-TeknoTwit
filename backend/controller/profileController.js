@@ -150,3 +150,16 @@ exports.sendDirectMessage = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// Helper function to check if two users are friends
+async function areFriends(userId1, userId2) {
+  const friendship = await prisma.friendship.findFirst({
+    where: {
+      OR: [
+        { requesterId: userId1, addresseeId: userId2, status: "ACCEPTED" },
+        { requesterId: userId2, addresseeId: userId1, status: "ACCEPTED" },
+      ],
+    },
+  });
+  return Boolean(friendship);
+}

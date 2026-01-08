@@ -71,3 +71,27 @@ exports.deleteProfile = async (req, res) => {
 };
 
 // GET authenticated user's profile
+exports.getMyProfile = async (req, res) => {
+  try {
+    const authUserId = req.user && req.user.id ? Number(req.user.id) : null;
+
+    if (!authUserId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: authUserId },
+      select: {
+        id: true,
+        username: true,
+        bio: true,
+        avatarUrl: true,
+        createdAt: true,
+      },
+    });
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

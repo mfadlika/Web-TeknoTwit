@@ -115,3 +115,38 @@ exports.deleteMyProfile = async (req, res) => {
   }
 };
 
+// Additional profile-related controllers can be added here
+
+exports.sendDirectMessage = async (req, res) => {
+  try {
+    const senderId = getAuthUserId(req);
+    const { receiverId, content, postId } = req.body;
+
+    if (!senderId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    if (!receiverId || !content) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const receiver = await prisma.user.findUnique({
+      where: { id: Number(receiverId) },
+    });
+    if (!receiver) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const message = await prisma.message.create({
+      data: {
+        senderId,
+        receiverId: Number(receiverId),
+        content,
+        postId: postId ? Number(postId) : null,
+      },
+    });
+
+    res.status(201).json({ message: "Message sent", dm: message });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

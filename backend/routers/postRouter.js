@@ -7,6 +7,7 @@ const {
   createPosture,
   repostPost,
   unrepostPost,
+  likePost,
 } = require("../controller/postController");
 
 const postRouter = express.Router();
@@ -28,7 +29,7 @@ postRouter.post("/", auth, createPost);
 postRouter.post("/picture", auth, createPosture);
 
 // create like route here in the future
-postRouter.post("/:id/like", getPost);
+postRouter.post("/:id/like", auth, likePost);
 
 // repost routes
 postRouter.post("/:id/repost", auth, repostPost);

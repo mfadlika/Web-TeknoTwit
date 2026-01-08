@@ -7,16 +7,16 @@ const SECRET = process.env.JWT_SECRET || "dev_secret";
 // User login controller
 exports.postLogin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    if (!email || !password) {
+    if (!username || !password) {
       return res
         .status(400)
-        .json({ message: "Email and password are required" });
+        .json({ message: "Username and password are required" });
     }
 
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { username },
     });
 
     if (!user || user.password !== password) {
@@ -25,7 +25,7 @@ exports.postLogin = async (req, res) => {
 
     // sign a JWT containing minimal user info
     const token = jwt.sign(
-      { id: user.id, name: user.name, email: user.email },
+      { id: user.id, name: user.name, username: user.username, email: user.email },
       SECRET,
       {
         expiresIn: "7d",
@@ -40,12 +40,21 @@ exports.postLogin = async (req, res) => {
 // User signup controller
 exports.postSignUp = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, username, email, password } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !username || !email || !password) {
       return res
         .status(400)
-        .json({ message: "Name, email and password are required" });
+        .json({ message: "Name, username, email and password are required" });
+    }
+
+    const normalizedUsername = String(username).trim();
+    const usernamePattern = /^[a-zA-Z0-9_]{3,20}$/;
+    if (!usernamePattern.test(normalizedUsername)) {
+      return res.status(400).json({
+        message:
+          "Username must be 3-20 characters and contain only letters, numbers, or underscore",
+      });
     }
 
     // only allow teknokrat.ac.id emails
@@ -61,16 +70,28 @@ exports.postSignUp = async (req, res) => {
         .status(400)
         .json({ message: "Password must be 20 characters or less" });
     }
+    if (!/\d/.test(String(password))) {
+      return res
+        .status(400)
+        .json({ message: "Password must include at least one number" });
+    }
 
     // check if email already exists
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       return res.status(409).json({ message: "Email already in use" });
     }
+    const existingUsername = await prisma.user.findUnique({
+      where: { username: normalizedUsername },
+    });
+    if (existingUsername) {
+      return res.status(409).json({ message: "Username already in use" });
+    }
 
     const user = await prisma.user.create({
       data: {
         name,
+        username: normalizedUsername,
         email,
         password,
       },

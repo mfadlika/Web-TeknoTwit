@@ -25,7 +25,7 @@ postRouter.get("/", getPosts);
 postRouter.post("/", auth, createPost);
 
 // Create picture post
-postRouter.post("/picture", auth, createPostpicture);
+postRouter.post("/picture", auth, createPosture);
 
 // create like route here in the future
 postRouter.post("/:id/like", getPost);

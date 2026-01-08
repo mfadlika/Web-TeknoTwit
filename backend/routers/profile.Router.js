@@ -4,16 +4,18 @@ const {
   getProfile,
   updateProfile,
   deleteProfile,
-  followProfile,
-  unfollowProfile,
+  getMyProfile,
+  deleteMyProfile,
+  sendDirectMessage,
 } = require("../controller/profileController");
 
 const profileRouter = express.Router();
 
-profileRouter.get("/", auth, getProfile);
-profileRouter.put("/", auth, updateProfile);
-profileRouter.delete("/", auth, deleteProfile);
-profileRouter.post("/follow/:userId", auth, followProfile);
-profileRouter.post("/unfollow/:userId", auth, unfollowProfile);
+profileRouter.get("/me/profile", auth, getMyProfile);
+profileRouter.delete("/me/profile", auth, deleteMyProfile);
+profileRouter.post("/dm", auth, sendDirectMessage);
+profileRouter.get("/:userId", getProfile);
+profileRouter.put("/:userId", auth, updateProfile);
+profileRouter.delete("/:userId", auth, deleteProfile);
 
 module.exports = profileRouter;

@@ -95,3 +95,23 @@ exports.getMyProfile = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// DELETE authenticated user's profile
+exports.deleteMyProfile = async (req, res) => {
+  try {
+    const authUserId = req.user && req.user.id ? Number(req.user.id) : null;
+
+    if (!authUserId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const deletedUser = await prisma.user.delete({
+      where: { id: authUserId },
+    });
+
+    res.json({ message: "User deleted", user: deletedUser });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+

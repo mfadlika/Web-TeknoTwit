@@ -208,3 +208,36 @@ exports.unrepostPost = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.likePost = async (req, res) => {
+  try {
+    const postId = Number(req.params.id);
+    const userId = req.user && req.user.id ? Number(req.user.id) : null;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    if (!postId) {
+      return res.status(400).json({ message: "Invalid post id" });
+    }
+
+    const post = await prisma.post.findUnique({ where: { id: postId } });
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    const existing = await prisma.like.findUnique({
+      where: { userId_postId: { userId, postId } },
+    });
+    if (existing) {
+      return res.status(409).json({ message: "Already liked" });
+    }
+
+    const like = await prisma.like.create({
+      data: { userId, postId },
+    });
+    res.status(201).json({ message: "Liked", like });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+  };

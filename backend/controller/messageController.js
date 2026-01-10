@@ -141,3 +141,41 @@ exports.deleteMessage = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.editMessage = async (req, res) => {
+  try {
+    const userId = getAuthUserId(req);
+    const messageId = Number(req.params.id);
+    const newContent =
+      typeof req.body.content === "string" ? req.body.content : null;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    if (!messageId) {
+      return res.status(400).json({ message: "Invalid message id" });
+    }
+    if (!newContent) {
+      return res.status(400).json({ message: "Content is required" });
+    }
+
+    const message = await prisma.message.findUnique({
+      where: { id: messageId },
+    });
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+    if (message.senderId !== userId) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const updatedMessage = await prisma.message.update({
+      where: { id: messageId },
+      data: { content: newContent },
+    });
+
+    res.json({ message: "Message updated", data: updatedMessage });
+    } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

@@ -111,3 +111,33 @@ exports.sendDirectMessageWithPost = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.deleteMessage = async (req, res) => {
+  try {
+    const userId = getAuthUserId(req);
+    const messageId = Number(req.params.id);
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    if (!messageId) {
+      return res.status(400).json({ message: "Invalid message id" });
+    }
+
+    const message = await prisma.message.findUnique({
+      where: { id: messageId },
+    });
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+    if (message.senderId !== userId) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    await prisma.message.delete({ where: { id: messageId } });
+
+    res.json({ message: "Message deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

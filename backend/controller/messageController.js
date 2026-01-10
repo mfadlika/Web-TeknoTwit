@@ -42,3 +42,32 @@ exports.sendMessage = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.getMessages = async (req, res) => {
+  try {
+    const userId = getAuthUserId(req);
+    const otherUserId = Number(req.query.userId);
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    if (!otherUserId) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
+
+    const messages = await prisma.message.findMany({
+      where: {
+        OR: [
+          { senderId: userId, receiverId: otherUserId },
+          { senderId: otherUserId, receiverId: userId },
+        ],
+      },
+      orderBy: { createdAt: "asc" },
+    });
+
+    res.json({ messages });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+

@@ -244,3 +244,35 @@ exports.likePost = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
   };
+
+exports.unlikePost = async (req, res) => {
+  try {
+    const postId = Number(req.params.id);
+    const userId = req.user && req.user.id ? Number(req.user.id) : null;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    if (!postId) {
+      return res.status(400).json({ message: "Invalid post id" });
+    }
+
+    const existing = await prisma.like.findUnique({
+      where: { userId_postId: { userId, postId } },
+    });
+    if (!existing) {
+      return res.status(404).json({ message: "Like not found" });
+    }
+
+    await prisma.like.delete({
+      where: { userId_postId: { userId, postId } },
+    });
+
+    res.json({ message: "Like removed" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.unlikePost = exports.unlikePost;
+

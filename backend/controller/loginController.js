@@ -4,32 +4,34 @@ const jwt = require("jsonwebtoken");
 
 const SECRET = process.env.JWT_SECRET || "dev_secret";
 
-// User login controller
+// User login controller (email + password)
 exports.postLogin = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!username || !password) {
+    if (!email || !password) {
       return res
         .status(400)
-        .json({ message: "Username and password are required" });
+        .json({ message: "Email and password are required" });
     }
 
     const user = await prisma.user.findUnique({
-      where: { username },
+      where: { email },
     });
 
     if (!user || user.password !== password) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // sign a JWT containing minimal user info
     const token = jwt.sign(
-      { id: user.id, name: user.name, username: user.username, email: user.email },
-      SECRET,
       {
-        expiresIn: "7d",
-      }
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+      },
+      SECRET,
+      { expiresIn: "7d" }
     );
 
     res.json({ message: "Login successful", userId: user.id, token });

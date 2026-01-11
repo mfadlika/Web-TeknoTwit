@@ -133,9 +133,12 @@ export default function UserPage() {
       }
 
       try {
-        const res = await axios.get(`${API_BASE}/follow/following/${currentUserId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          `${API_BASE}/follow/following/${currentUserId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const following = res.data || [];
         const isCurrentlyFollowing = following.some(
           (f) => f.following.id === Number(id)
@@ -155,9 +158,13 @@ export default function UserPage() {
     if (!token) return;
     setFollowLoading(true);
     try {
-      await axios.post(`${API_BASE}/follow/follow/${id}`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.post(
+        `${API_BASE}/follow/follow/${id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setIsFollowing(true);
     } catch (err) {
       if (err.response?.status === 409) {
@@ -174,9 +181,13 @@ export default function UserPage() {
     if (!token) return;
     setFollowLoading(true);
     try {
-      await axios.post(`${API_BASE}/follow/unfollow/${id}`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.post(
+        `${API_BASE}/follow/unfollow/${id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setIsFollowing(false);
     } catch (err) {
       if (err.response?.status === 404) {
@@ -283,7 +294,14 @@ export default function UserPage() {
                 {user.name ? user.name.charAt(0) : "U"}
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    marginBottom: 6,
+                  }}
+                >
                   <div
                     style={{
                       fontSize: 24,
@@ -311,16 +329,24 @@ export default function UserPage() {
                       }}
                       onMouseEnter={(e) => {
                         if (!followLoading) {
-                          e.currentTarget.style.background = isFollowing ? "#e0e0e0" : "#5568d3";
+                          e.currentTarget.style.background = isFollowing
+                            ? "#e0e0e0"
+                            : "#5568d3";
                           e.currentTarget.style.transform = "translateY(-1px)";
                         }
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.background = isFollowing ? "#f0f0f0" : "#667eea";
+                        e.currentTarget.style.background = isFollowing
+                          ? "#f0f0f0"
+                          : "#667eea";
                         e.currentTarget.style.transform = "translateY(0)";
                       }}
                     >
-                      {followLoading ? "..." : isFollowing ? "Unfollow" : "Follow"}
+                      {followLoading
+                        ? "..."
+                        : isFollowing
+                        ? "Unfollow"
+                        : "Follow"}
                     </button>
                   )}
                 </div>

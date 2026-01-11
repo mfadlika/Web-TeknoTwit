@@ -131,16 +131,28 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState(null);
+  const [tab, setTab] = useState("all"); // "all" or "following"
 
   const API_BASE =
     process.env.REACT_APP_API_BASE || "http://localhost:3000/api";
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     let mounted = true;
     setLoading(true);
-    axios
-      .get(`${API_BASE}/post`)
-      .then((res) => {
+
+    const fetchPosts = async () => {
+      try {
+        let url = `${API_BASE}/post`;
+        const config = {};
+
+        if (tab === "following" && token) {
+          url = `${API_BASE}/post/following/feed`;
+          config.headers = { Authorization: `Bearer ${token}` };
+        }
+
+        const res = await axios.get(url, config);
+
         if (!mounted) return;
         const apiPosts = (res.data || []).map((p) => ({
           id: p.id || `post_${Math.random()}`,
@@ -155,20 +167,24 @@ export default function HomePage() {
           likes: p.likes || 0,
         }));
         if (apiPosts.length) setPosts(apiPosts.reverse());
-      })
-      .catch((err) => {
-        setError("Gagal memuat posts");
-        console.warn(
-          "Failed to load posts from API, using mock posts",
-          err.message
+        else setPosts([]);
+      } catch (err) {
+        setError(
+          tab === "following"
+            ? "Gagal memuat posts dari following"
+            : "Gagal memuat posts"
         );
-      })
-      .finally(() => mounted && setLoading(false));
+        console.warn("Failed to load posts:", err.message);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
 
+    fetchPosts();
     return () => {
       mounted = false;
     };
-  }, [API_BASE]);
+  }, [API_BASE, tab, token]);
 
   return (
     <div
@@ -196,6 +212,64 @@ export default function HomePage() {
             Share your thoughts with the community
           </p>
         </div>
+
+        {token && (
+          <div
+            style={{
+              display: "flex",
+              gap: 12,
+              marginBottom: 24,
+              borderBottom: "1px solid #e0e0e0",
+              paddingBottom: 12,
+            }}
+          >
+            <button
+              onClick={() => setTab("all")}
+              style={{
+                padding: "8px 16px",
+                border: "none",
+                background: "transparent",
+                color: tab === "all" ? "#667eea" : "#999",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+                borderBottom: tab === "all" ? "2px solid #667eea" : "none",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                if (tab !== "all") e.currentTarget.style.color = "#666";
+              }}
+              onMouseLeave={(e) => {
+                if (tab !== "all") e.currentTarget.style.color = "#999";
+              }}
+            >
+              All Posts
+            </button>
+            <button
+              onClick={() => setTab("following")}
+              style={{
+                padding: "8px 16px",
+                border: "none",
+                background: "transparent",
+                color: tab === "following" ? "#667eea" : "#999",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+                borderBottom:
+                  tab === "following" ? "2px solid #667eea" : "none",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                if (tab !== "following") e.currentTarget.style.color = "#666";
+              }}
+              onMouseLeave={(e) => {
+                if (tab !== "following") e.currentTarget.style.color = "#999";
+              }}
+            >
+              Following
+            </button>
+          </div>
+        )}
 
         {loading && (
           <div

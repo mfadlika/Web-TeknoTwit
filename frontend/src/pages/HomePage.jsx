@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-function PostCard({ post }) {
+function PostCard({ post, onToggleLike }) {
   const cardStyle = {
     padding: 12,
     borderRadius: 8,
@@ -21,6 +21,16 @@ function PostCard({ post }) {
     alignItems: "center",
     justifyContent: "center",
     fontWeight: 700,
+  };
+
+  const likeButtonStyle = {
+    padding: "6px 10px",
+    borderRadius: 8,
+    border: "1px solid #ddd",
+    background: "#f7f7f7",
+    color: "#333",
+    cursor: "pointer",
+    fontWeight: 600,
   };
 
   const userId =
@@ -52,8 +62,20 @@ function PostCard({ post }) {
             </div>
           </div>
           <div style={{ marginTop: 8, color: "#111" }}>{post.content}</div>
-          <div style={{ marginTop: 10, color: "#555", fontSize: 13 }}>
-            {post.likes} likes
+          <div
+            style={{
+              marginTop: 10,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <button onClick={() => onToggleLike(post)} style={likeButtonStyle}>
+              ❤ Like
+            </button>
+            <span style={{ color: "#555", fontSize: 13 }}>
+              {post.likes} likes
+            </span>
           </div>
         </div>
       </div>
@@ -80,12 +102,10 @@ export default function HomePage() {
         if (!mounted) return;
         const apiPosts = (res.data || []).map((p) => ({
           id: p.id || `post_${Math.random()}`,
-          // include author name and id so links work
           author: {
             name: p.userName || (p.user && p.user.name) || `User ${p.userId}`,
             id: (p.user && p.user.id) || p.userId || null,
           },
-          // preserve raw user object (if backend provided)
           user: p.user || null,
           userId: (p.user && p.user.id) || p.userId || null,
           content: p.content,
@@ -95,6 +115,7 @@ export default function HomePage() {
         if (apiPosts.length) setPosts(apiPosts.reverse());
       })
       .catch((err) => {
+        setError("Gagal memuat posts");
         console.warn(
           "Failed to load posts from API, using mock posts",
           err.message
@@ -105,11 +126,17 @@ export default function HomePage() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [API_BASE]);
 
   return (
     <div style={{ maxWidth: 800, margin: "28px auto", padding: "0 16px" }}>
       <h1 style={{ marginBottom: 14 }}>Beranda</h1>
+      {loading && (
+        <div style={{ marginBottom: 12, color: "#555" }}>Loading...</div>
+      )}
+      {error && (
+        <div style={{ marginBottom: 12, color: "#b00020" }}>{error}</div>
+      )}
 
       <div style={{ marginBottom: 12 }}>
         <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
@@ -225,7 +252,63 @@ export default function HomePage() {
 
       <div style={{ display: "grid", gap: 12 }}>
         {posts.map((p) => (
-          <PostCard key={p.id} post={p} />
+          <PostCard
+            key={p.id}
+            post={p}
+            onToggleLike={async (post) => {
+              try {
+                const token = localStorage.getItem("token");
+                if (!token) {
+                  setError("Silakan login untuk menyukai post.");
+                  return;
+                }
+                const likeUrl = `${API_BASE}/post/${post.id}/like`;
+                // Try to like
+                const res = await axios.post(likeUrl, null, {
+                  headers: { Authorization: `Bearer ${token}` },
+                });
+                const newLikes =
+                  res.data && typeof res.data.likes === "number"
+                    ? res.data.likes
+                    : post.likes + 1;
+                setPosts((prev) =>
+                  prev.map((x) =>
+                    x.id === post.id ? { ...x, likes: newLikes } : x
+                  )
+                );
+              } catch (err) {
+                if (err.response && err.response.status === 409) {
+                  // already liked, toggle to unlike
+                  try {
+                    const token = localStorage.getItem("token");
+                    const unlikeUrl = `${API_BASE}/post/${post.id}/like`;
+                    const res = await axios.delete(unlikeUrl, {
+                      headers: { Authorization: `Bearer ${token}` },
+                    });
+                    const newLikes =
+                      res.data && typeof res.data.likes === "number"
+                        ? res.data.likes
+                        : Math.max(0, post.likes - 1);
+                    setPosts((prev) =>
+                      prev.map((x) =>
+                        x.id === post.id ? { ...x, likes: newLikes } : x
+                      )
+                    );
+                  } catch (e2) {
+                    console.error("Unlike failed", e2);
+                  }
+                } else if (err.response && err.response.status === 401) {
+                  setError(
+                    "Token tidak valid atau kadaluarsa. Silakan login ulang."
+                  );
+                  localStorage.removeItem("token");
+                  window.dispatchEvent(new Event("app:auth-changed"));
+                } else {
+                  console.error("Like failed", err);
+                }
+              }
+            }}
+          />
         ))}
       </div>
     </div>

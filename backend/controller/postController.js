@@ -18,12 +18,27 @@ exports.getPosts = async (req, res) => {
     }
     const usersById = Object.fromEntries(users.map((u) => [u.id, u]));
 
-    const postsWithUser = posts.map((p) => ({
+    // fetch like counts per post
+    const postIds = posts.map((p) => p.id);
+    let likeCountsByPostId = {};
+    if (postIds.length) {
+      const likeGroups = await prisma.like.groupBy({
+        by: ["postId"],
+        _count: { postId: true },
+        where: { postId: { in: postIds } },
+      });
+      likeCountsByPostId = Object.fromEntries(
+        likeGroups.map((g) => [g.postId, g._count.postId])
+      );
+    }
+
+    const postsWithExtras = posts.map((p) => ({
       ...p,
       user: usersById[p.userId] || null,
+      likes: likeCountsByPostId[p.id] || 0,
     }));
 
-    res.json(postsWithUser);
+    res.json(postsWithExtras);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -34,17 +49,15 @@ exports.getPost = async (req, res) => {
   try {
     const id = Number(req.params.id);
 
-    const post = await prisma.post.findUnique({
-      where: { id },
-    });
-
+    const post = await prisma.post.findUnique({ where: { id } });
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    // attach user
     const user = await prisma.user.findUnique({ where: { id: post.userId } });
-    res.json({ ...post, user });
+    const likes = await prisma.like.count({ where: { postId: id } });
+
+    res.json({ ...post, user, likes });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -96,7 +109,6 @@ exports.createPost = async (req, res) => {
     const user = await prisma.user.findUnique({
       where: { id: Number(userId) },
     });
-
 
     res.json({
       message: "Post created successfully",
@@ -239,11 +251,12 @@ exports.likePost = async (req, res) => {
     const like = await prisma.like.create({
       data: { userId, postId },
     });
-    res.status(201).json({ message: "Liked", like });
+    const likes = await prisma.like.count({ where: { postId } });
+    res.status(201).json({ message: "Liked", like, likes });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-  };
+};
 
 exports.unlikePost = async (req, res) => {
   try {
@@ -268,11 +281,9 @@ exports.unlikePost = async (req, res) => {
       where: { userId_postId: { userId, postId } },
     });
 
-    res.json({ message: "Like removed" });
+    const likes = await prisma.like.count({ where: { postId } });
+    res.json({ message: "Like removed", likes });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-
-exports.unlikePost = exports.unlikePost;
-

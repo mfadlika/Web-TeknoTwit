@@ -8,6 +8,7 @@ const {
   repostPost,
   unrepostPost,
   likePost,
+  unlikePost,
 } = require("../controller/postController");
 
 const postRouter = express.Router();
@@ -28,10 +29,11 @@ postRouter.post("/", auth, createPost);
 // Create picture post
 postRouter.post("/picture", auth, createPosture);
 
-// create like route here in the future
+// Like / Unlike
 postRouter.post("/:id/like", auth, likePost);
+postRouter.delete("/:id/like", auth, unlikePost);
 
-// repost routes
+// Repost routes
 postRouter.post("/:id/repost", auth, repostPost);
 postRouter.delete("/:id/repost", auth, unrepostPost);
 

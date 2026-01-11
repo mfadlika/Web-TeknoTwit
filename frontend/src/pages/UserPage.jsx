@@ -90,9 +90,13 @@ export default function UserPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
 
   const API_BASE =
     process.env.REACT_APP_API_BASE || "http://localhost:3000/api";
+  const currentUserId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     let mounted = true;
@@ -119,6 +123,71 @@ export default function UserPage() {
     load();
     return () => (mounted = false);
   }, [id, API_BASE]);
+
+  useEffect(() => {
+    let mounted = true;
+    async function checkFollowing() {
+      if (!currentUserId || !token || Number(currentUserId) === Number(id)) {
+        setIsFollowing(false);
+        return;
+      }
+
+      try {
+        const res = await axios.get(`${API_BASE}/follow/following/${currentUserId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const following = res.data || [];
+        const isCurrentlyFollowing = following.some(
+          (f) => f.following.id === Number(id)
+        );
+        if (mounted) setIsFollowing(isCurrentlyFollowing);
+      } catch (err) {
+        console.error("Failed to check follow status:", err);
+        if (mounted) setIsFollowing(false);
+      }
+    }
+
+    checkFollowing();
+    return () => (mounted = false);
+  }, [id, currentUserId, token, API_BASE]);
+
+  const handleFollow = async () => {
+    if (!token) return;
+    setFollowLoading(true);
+    try {
+      await axios.post(`${API_BASE}/follow/follow/${id}`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setIsFollowing(true);
+    } catch (err) {
+      if (err.response?.status === 409) {
+        setIsFollowing(true);
+      } else {
+        console.error("Failed to follow:", err);
+      }
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
+  const handleUnfollow = async () => {
+    if (!token) return;
+    setFollowLoading(true);
+    try {
+      await axios.post(`${API_BASE}/follow/unfollow/${id}`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setIsFollowing(false);
+    } catch (err) {
+      if (err.response?.status === 404) {
+        setIsFollowing(false);
+      } else {
+        console.error("Failed to unfollow:", err);
+      }
+    } finally {
+      setFollowLoading(false);
+    }
+  };
 
   return (
     <div
@@ -214,15 +283,46 @@ export default function UserPage() {
                 {user.name ? user.name.charAt(0) : "U"}
               </div>
               <div style={{ flex: 1 }}>
-                <div
-                  style={{
-                    fontSize: 24,
-                    fontWeight: 700,
-                    color: "#1a1a1a",
-                    marginBottom: 6,
-                  }}
-                >
-                  {user.name}
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
+                  <div
+                    style={{
+                      fontSize: 24,
+                      fontWeight: 700,
+                      color: "#1a1a1a",
+                    }}
+                  >
+                    {user.name}
+                  </div>
+                  {Number(currentUserId) !== Number(id) && token && (
+                    <button
+                      onClick={isFollowing ? handleUnfollow : handleFollow}
+                      disabled={followLoading}
+                      style={{
+                        padding: "6px 14px",
+                        borderRadius: 6,
+                        border: "none",
+                        background: isFollowing ? "#f0f0f0" : "#667eea",
+                        color: isFollowing ? "#333" : "#fff",
+                        fontSize: 12,
+                        fontWeight: 600,
+                        cursor: followLoading ? "not-allowed" : "pointer",
+                        transition: "all 0.2s",
+                        opacity: followLoading ? 0.7 : 1,
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!followLoading) {
+                          e.currentTarget.style.background = isFollowing ? "#e0e0e0" : "#5568d3";
+                          e.currentTarget.style.transform = "translateY(-1px)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = isFollowing ? "#f0f0f0" : "#667eea";
+                        e.currentTarget.style.transform = "translateY(0)";
+                      }}
+                    >
+                      {followLoading ? "..." : isFollowing ? "Unfollow" : "Follow"}
+                    </button>
+                  )}
                 </div>
                 <div style={{ color: "#666", fontSize: 14, marginBottom: 12 }}>
                   {user.email}

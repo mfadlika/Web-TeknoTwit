@@ -14,9 +14,13 @@ import UserPage from "./pages/UserPage";
 function NavBar() {
   const navigate = useNavigate();
   const [token, setToken] = useState(localStorage.getItem("token"));
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
 
   useEffect(() => {
-    const handler = () => setToken(localStorage.getItem("token"));
+    const handler = () => {
+      setToken(localStorage.getItem("token"));
+      setUserId(localStorage.getItem("userId"));
+    };
     window.addEventListener("app:auth-changed", handler);
     return () => window.removeEventListener("app:auth-changed", handler);
   }, []);
@@ -86,6 +90,26 @@ function NavBar() {
                 }}
               >
                 Home
+              </Link>
+              <Link
+                to={`/user/${userId}`}
+                style={{
+                  color: "#333",
+                  textDecoration: "none",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  padding: "6px 12px",
+                  borderRadius: 6,
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#f0f0f0";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                }}
+              >
+                Profile
               </Link>
               <button
                 onClick={handleLogout}

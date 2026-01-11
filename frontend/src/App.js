@@ -29,26 +29,136 @@ function NavBar() {
   };
 
   return (
-    <nav style={{ padding: 12 }}>
-      <Link to="/" style={{ marginRight: 12 }}>
-        Home
-      </Link>
-
-      {token ? (
-        <button
-          onClick={handleLogout}
-          style={{ marginLeft: 8, padding: "6px 10px", borderRadius: 6 }}
+    <nav
+      style={{
+        padding: "14px 20px",
+        background: "#fff",
+        borderBottom: "1px solid #f0f0f0",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 640,
+          margin: "0 auto",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Link
+          to="/"
+          style={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: "#667eea",
+            textDecoration: "none",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
         >
-          Logout
-        </button>
-      ) : (
-        <>
-          <Link to="/login" style={{ marginRight: 12 }}>
-            Login
-          </Link>
-          <Link to="/signup">Daftar</Link>
-        </>
-      )}
+          TeknoTwit
+        </Link>
+
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          {token ? (
+            <>
+              <Link
+                to="/"
+                style={{
+                  color: "#333",
+                  textDecoration: "none",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  padding: "6px 12px",
+                  borderRadius: 6,
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#f0f0f0";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                }}
+              >
+                Home
+              </Link>
+              <button
+                onClick={handleLogout}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: 6,
+                  border: "1px solid #667eea",
+                  background: "transparent",
+                  color: "#667eea",
+                  fontWeight: 600,
+                  fontSize: 14,
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#667eea";
+                  e.currentTarget.style.color = "#fff";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = "#667eea";
+                }}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                style={{
+                  color: "#333",
+                  textDecoration: "none",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  padding: "6px 12px",
+                  borderRadius: 6,
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#f0f0f0";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                }}
+              >
+                Login
+              </Link>
+              <Link
+                to="/signup"
+                style={{
+                  color: "#fff",
+                  textDecoration: "none",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  padding: "8px 14px",
+                  borderRadius: 6,
+                  background: "#667eea",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#5568d3";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#667eea";
+                }}
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
     </nav>
   );
 }

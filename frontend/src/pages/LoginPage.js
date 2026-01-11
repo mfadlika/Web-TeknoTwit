@@ -22,12 +22,13 @@ export default function LoginPage() {
 
     setIsLoading(true);
     try {
-      const normalizedUsername = String(username).trim();
+      const localPart = String(username).trim().split("@")[0];
+      const loginEmail = `${localPart}${EMAIL_DOMAIN}`;
 
       const res = await fetch("http://localhost:3000/api/user/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: normalizedUsername, password }),
+        body: JSON.stringify({ email: loginEmail, password }),
       });
 
       const data = await res.json();

@@ -1,21 +1,33 @@
 import React, { useState } from "react";
+import "./SignupPage.css";
 
 export default function SignupPage() {
-  const [name, setName] = useState("");
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+
+  const EMAIL_DOMAIN = "@teknokrat.ac.id";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
 
-    if (!name || !username || !email || !password) {
-      setError("Name, username, email, and password are required");
+    if (!username || !password || !confirmPassword) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
       return;
     }
 
@@ -27,106 +39,100 @@ export default function SignupPage() {
       return;
     }
 
-    // Client-side domain validation for better UX
-    const allowedDomain = "@teknokrat.ac.id";
-    if (!String(email).toLowerCase().endsWith(allowedDomain)) {
-      setError(`Hanya email ${allowedDomain} yang dapat mendaftar`);
-      return;
-    }
-
-    if (!/\d/.test(String(password))) {
-      setError("Password harus mengandung minimal 1 angka");
-      return;
-    }
-
-    setLoading(true);
+    setIsLoading(true);
     try {
+      const localPart = String(username).trim().split("@")[0];
+      const signupEmail = `${localPart}${EMAIL_DOMAIN}`;
+
       const res = await fetch("http://localhost:3000/api/user/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, username, email, password }),
+        body: JSON.stringify({
+          name: username,
+          username: localPart,
+          email: signupEmail,
+          password,
+        }),
       });
 
       const data = await res.json();
       if (!res.ok) {
         setError(data.message || data.error || "Signup failed");
-        setLoading(false);
+        setIsLoading(false);
         return;
       }
 
-      setSuccess("Akun berhasil dibuat. Silakan masuk.");
-      // optionally redirect to login
+      setSuccess("Account created. Please sign in.");
       setTimeout(() => {
         window.location.href = "/login";
       }, 800);
     } catch (err) {
       setError(err.message || "Network error");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: 480, margin: "48px auto", padding: 20 }}>
-      <h2>Daftar</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 12 }}>
-          <label style={{ display: "block", marginBottom: 6 }}>Nama</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={{ width: "100%", padding: 8 }}
-            placeholder="Nama lengkap"
-          />
+    <div className="signup-container">
+      <div className="signup-header">
+        <h2 className="signup-title">Create Account</h2>
+        <p className="signup-subtitle">Sign up to get started</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="signup-form">
+        <div className="signup-field">
+          <label className="signup-label">Username</label>
+          <div className="signup-input-row">
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="signup-input"
+              placeholder="Choose a username"
+            />
+            <div className="signup-domain">{EMAIL_DOMAIN}</div>
+          </div>
         </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <label style={{ display: "block", marginBottom: 6 }}>Username</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            style={{ width: "100%", padding: 8 }}
-            placeholder="username anda"
-          />
-        </div>
-
-        <div style={{ marginBottom: 12 }}>
-          <label style={{ display: "block", marginBottom: 6 }}>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ width: "100%", padding: 8 }}
-            placeholder="you@example.com"
-          />
-        </div>
-
-        <div style={{ marginBottom: 12 }}>
-          <label style={{ display: "block", marginBottom: 6 }}>Password</label>
+        <div className="signup-field">
+          <label className="signup-label">Password</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={{ width: "100%", padding: 8 }}
-            placeholder="Max 20 characters"
+            className="signup-input"
+            placeholder="Create a password"
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{ padding: "8px 12px" }}
-        >
-          {loading ? "Mendaftarkan..." : "Daftar"}
+        <div className="signup-field">
+          <label className="signup-label">Confirm Password</label>
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className="signup-input"
+            placeholder="Re-enter your password"
+          />
+        </div>
+
+        <button type="submit" disabled={isLoading} className="signup-button">
+          {isLoading ? "Creating Account..." : "Sign Up"}
         </button>
       </form>
 
-      {error && <div style={{ marginTop: 12, color: "#b00020" }}>{error}</div>}
+      {error && <div className="signup-feedback signup-error">{error}</div>}
       {success && (
-        <div style={{ marginTop: 12, color: "#007700" }}>{success}</div>
+        <div className="signup-feedback signup-success">{success}</div>
       )}
+
+      <div className="signup-footer">
+        <span>Already have an account?</span>
+        <a href="/login" className="signup-login-link">
+          Sign In
+        </a>
+      </div>
     </div>
   );
 }

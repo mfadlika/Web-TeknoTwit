@@ -83,6 +83,65 @@ exports.getPostsByUser = async (req, res) => {
   }
 };
 
+// GET posts from followed users (authenticated)
+exports.getFollowingPosts = async (req, res) => {
+  try {
+    const followerId = req.user && req.user.id ? Number(req.user.id) : null;
+
+    if (!followerId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Get list of users that this user follows
+    const following = await prisma.follow.findMany({
+      where: { followerId },
+      select: { followingId: true },
+    });
+
+    const followingIds = following.map((f) => f.followingId);
+
+    // Get posts from those users
+    const posts = await prisma.post.findMany({
+      where: { userId: { in: followingIds } },
+      orderBy: { createdAt: "desc" },
+    });
+
+    // fetch users for posts
+    const userIds = Array.from(
+      new Set(posts.map((p) => p.userId).filter(Boolean))
+    );
+    let users = [];
+    if (userIds.length) {
+      users = await prisma.user.findMany({ where: { id: { in: userIds } } });
+    }
+    const usersById = Object.fromEntries(users.map((u) => [u.id, u]));
+
+    // fetch like counts per post
+    const postIds = posts.map((p) => p.id);
+    let likeCountsByPostId = {};
+    if (postIds.length) {
+      const likeGroups = await prisma.like.groupBy({
+        by: ["postId"],
+        _count: { postId: true },
+        where: { postId: { in: postIds } },
+      });
+      likeCountsByPostId = Object.fromEntries(
+        likeGroups.map((g) => [g.postId, g._count.postId])
+      );
+    }
+
+    const postsWithExtras = posts.map((p) => ({
+      ...p,
+      user: usersById[p.userId] || null,
+      likes: likeCountsByPostId[p.id] || 0,
+    }));
+
+    res.json(postsWithExtras);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // CREATE new post (authenticated)
 exports.createPost = async (req, res) => {
   try {

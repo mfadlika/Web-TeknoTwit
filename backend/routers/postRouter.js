@@ -3,6 +3,7 @@ const {
   getPosts,
   getPost,
   getPostsByUser,
+  getFollowingPosts,
   createPost,
   createPosture,
   repostPost,
@@ -13,6 +14,9 @@ const {
 
 const postRouter = express.Router();
 const auth = require("../middleware/auth");
+
+// Get posts from followed users (requires auth)
+postRouter.get("/following/feed", auth, getFollowingPosts);
 
 // Get posts by user
 postRouter.get("/user/:userId", getPostsByUser);

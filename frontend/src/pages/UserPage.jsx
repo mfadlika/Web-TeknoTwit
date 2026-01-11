@@ -4,43 +4,79 @@ import axios from "axios";
 
 function PostCard({ post }) {
   const cardStyle = {
-    padding: 12,
-    borderRadius: 8,
-    border: "1px solid #e6e6e6",
+    padding: 16,
+    borderRadius: 12,
+    border: "1px solid #f0f0f0",
     background: "#fff",
-    boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    transition: "box-shadow 0.2s, border-color 0.2s",
   };
 
   const avatarStyle = {
-    width: 44,
-    height: 44,
+    width: 48,
+    height: 48,
     borderRadius: "50%",
-    background: "#1976d2",
+    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     color: "#fff",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontWeight: 700,
+    fontSize: 18,
+    flexShrink: 0,
   };
 
   return (
-    <div style={cardStyle}>
-      <div style={{ display: "flex", gap: 12 }}>
+    <div
+      style={cardStyle}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.12)";
+        e.currentTarget.style.borderColor = "#e8e8e8";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
+        e.currentTarget.style.borderColor = "#f0f0f0";
+      }}
+    >
+      <div style={{ display: "flex", gap: 14 }}>
         <div style={avatarStyle}>
           {(post.user && post.user.name && post.user.name.charAt(0)) || "U"}
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-            <div style={{ fontWeight: 700 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              marginBottom: 8,
+            }}
+          >
+            <div style={{ fontWeight: 700, fontSize: 15 }}>
               {post.user?.name || "Unknown"}
             </div>
-            <div style={{ color: "#999", fontSize: 12 }}>
-              • {new Date(post.createdAt || post.created_at).toLocaleString()}
+            <div style={{ color: "#999", fontSize: 13, marginLeft: "auto" }}>
+              {new Date(post.createdAt || post.created_at).toLocaleString()}
             </div>
           </div>
-          <div style={{ marginTop: 8 }}>{post.content}</div>
-          <div style={{ marginTop: 10, color: "#555", fontSize: 13 }}>
-            {post.likes || 0} likes
+          <div
+            style={{
+              marginTop: 10,
+              color: "#333",
+              lineHeight: 1.5,
+              fontSize: 14,
+            }}
+          >
+            {post.content}
+          </div>
+          <div
+            style={{
+              marginTop: 10,
+              color: "#666",
+              fontSize: 13,
+              fontWeight: 500,
+            }}
+          >
+            {post.likes || 0} {post.likes === 1 ? "like" : "likes"}
           </div>
         </div>
       </div>
@@ -64,7 +100,6 @@ export default function UserPage() {
       setLoading(true);
       setError(null);
       try {
-        // fetch user and posts in parallel
         const [userRes, postsRes] = await Promise.all([
           axios.get(`${API_BASE}/user/${id}`),
           axios.get(`${API_BASE}/post/user/${id}`),
@@ -75,7 +110,7 @@ export default function UserPage() {
         setPosts(postsRes.data || []);
       } catch (err) {
         console.error(err);
-        if (mounted) setError("Gagal memuat data user.");
+        if (mounted) setError("Failed to load user profile.");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -83,68 +118,174 @@ export default function UserPage() {
 
     load();
     return () => (mounted = false);
-  }, [id]);
+  }, [id, API_BASE]);
 
   return (
-    <div style={{ maxWidth: 800, margin: "28px auto", padding: "0 16px" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 14,
-        }}
-      >
-        <h2>Postingan User</h2>
-        <Link to="/">Kembali</Link>
-      </div>
-
-      {loading && <div>Loading...</div>}
-      {error && <div style={{ color: "#b00020" }}>{error}</div>}
-
-      {user && (
-        <div
+    <div
+      style={{
+        background: "#fafafa",
+        minHeight: "100vh",
+        paddingTop: 20,
+        paddingBottom: 40,
+      }}
+    >
+      <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 16px" }}>
+        <Link
+          to="/"
           style={{
-            display: "flex",
-            gap: 12,
-            alignItems: "center",
-            marginBottom: 12,
+            color: "#667eea",
+            textDecoration: "none",
+            fontSize: 14,
+            fontWeight: 600,
+            marginBottom: 20,
+            display: "inline-block",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.textDecoration = "underline";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.textDecoration = "none";
           }}
         >
+          ← Back to Home
+        </Link>
+
+        {loading && (
           <div
             style={{
-              width: 64,
-              height: 64,
-              borderRadius: 64,
-              background: "#1976d2",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 28,
-              fontWeight: 700,
+              padding: 20,
+              textAlign: "center",
+              color: "#1976d2",
+              fontSize: 14,
             }}
           >
-            {user.name ? user.name.charAt(0) : "U"}
+            ⏳ Loading profile...
           </div>
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 700 }}>{user.name}</div>
-            <div style={{ color: "#666", fontSize: 13 }}>{user.email}</div>
-            <div style={{ color: "#666", fontSize: 13, marginTop: 6 }}>
-              {posts.length} postingan
+        )}
+        {error && (
+          <div
+            style={{
+              padding: 12,
+              borderRadius: 8,
+              background: "#ffebee",
+              color: "#c62828",
+              fontSize: 14,
+              marginBottom: 16,
+            }}
+          >
+            ⚠️ {error}
+          </div>
+        )}
+
+        {user && (
+          <div
+            style={{
+              padding: 24,
+              borderRadius: 12,
+              background: "#fff",
+              border: "1px solid #f0f0f0",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              marginBottom: 24,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                gap: 18,
+                alignItems: "flex-start",
+              }}
+            >
+              <div
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: "50%",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 32,
+                  fontWeight: 700,
+                  flexShrink: 0,
+                }}
+              >
+                {user.name ? user.name.charAt(0) : "U"}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div
+                  style={{
+                    fontSize: 24,
+                    fontWeight: 700,
+                    color: "#1a1a1a",
+                    marginBottom: 6,
+                  }}
+                >
+                  {user.name}
+                </div>
+                <div style={{ color: "#666", fontSize: 14, marginBottom: 12 }}>
+                  {user.email}
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 20,
+                    paddingTop: 12,
+                    borderTop: "1px solid #f0f0f0",
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 20,
+                        fontWeight: 700,
+                        color: "#667eea",
+                      }}
+                    >
+                      {posts.length}
+                    </div>
+                    <div style={{ fontSize: 13, color: "#666" }}>
+                      {posts.length === 1 ? "Post" : "Posts"}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+        )}
+
+        <div style={{ marginBottom: 16 }}>
+          <h2
+            style={{
+              margin: "0 0 16px 0",
+              fontSize: 20,
+              fontWeight: 700,
+              color: "#1a1a1a",
+            }}
+          >
+            Posts
+          </h2>
         </div>
-      )}
 
-      {!loading && !error && posts.length === 0 && (
-        <div>Belum ada postingan.</div>
-      )}
+        {!loading && !error && posts.length === 0 && (
+          <div
+            style={{
+              padding: 32,
+              textAlign: "center",
+              color: "#999",
+              fontSize: 14,
+            }}
+          >
+            No posts yet 📝
+          </div>
+        )}
 
-      <div style={{ display: "grid", gap: 12 }}>
-        {posts.map((p) => (
-          <PostCard key={p.id} post={p} />
-        ))}
+        <div style={{ display: "grid", gap: 14 }}>
+          {posts.map((p) => (
+            <PostCard key={p.id} post={p} />
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -63,7 +63,14 @@ function PostCard({ post, onToggleLike }) {
             "U"}
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              marginBottom: 8,
+            }}
+          >
             <div style={{ fontWeight: 700, fontSize: 15 }}>
               <Link
                 to={`/user/${userId}`}
@@ -76,7 +83,14 @@ function PostCard({ post, onToggleLike }) {
               {new Date(post.createdAt).toLocaleString()}
             </div>
           </div>
-          <div style={{ marginTop: 10, color: "#333", lineHeight: 1.5, fontSize: 14 }}>
+          <div
+            style={{
+              marginTop: 10,
+              color: "#333",
+              lineHeight: 1.5,
+              fontSize: 14,
+            }}
+          >
             {post.content}
           </div>
           <div
@@ -157,16 +171,25 @@ export default function HomePage() {
   }, [API_BASE]);
 
   return (
-    <div style={{ background: "#fafafa", minHeight: "100vh", paddingTop: 20, paddingBottom: 40 }}>
+    <div
+      style={{
+        background: "#fafafa",
+        minHeight: "100vh",
+        paddingTop: 20,
+        paddingBottom: 40,
+      }}
+    >
       <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 16px" }}>
         <div style={{ marginBottom: 28 }}>
-          <h1 style={{ 
-            margin: 0,
-            fontSize: 32,
-            fontWeight: 700,
-            color: "#1a1a1a",
-            letterSpacing: "-0.5px"
-          }}>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: 32,
+              fontWeight: 700,
+              color: "#1a1a1a",
+              letterSpacing: "-0.5px",
+            }}
+          >
             Home
           </h1>
           <p style={{ margin: "6px 0 0 0", color: "#666", fontSize: 14 }}>
@@ -175,38 +198,44 @@ export default function HomePage() {
         </div>
 
         {loading && (
-          <div style={{
-            marginBottom: 16,
-            padding: 12,
-            borderRadius: 8,
-            background: "#f0f8ff",
-            color: "#1976d2",
-            fontSize: 14,
-          }}>
+          <div
+            style={{
+              marginBottom: 16,
+              padding: 12,
+              borderRadius: 8,
+              background: "#f0f8ff",
+              color: "#1976d2",
+              fontSize: 14,
+            }}
+          >
             ⏳ Loading posts...
           </div>
         )}
         {error && (
-          <div style={{
-            marginBottom: 16,
-            padding: 12,
-            borderRadius: 8,
-            background: "#ffebee",
-            color: "#c62828",
-            fontSize: 14,
-          }}>
+          <div
+            style={{
+              marginBottom: 16,
+              padding: 12,
+              borderRadius: 8,
+              background: "#ffebee",
+              color: "#c62828",
+              fontSize: 14,
+            }}
+          >
             ⚠️ {error}
           </div>
         )}
 
-        <div style={{
-          marginBottom: 24,
-          padding: 16,
-          borderRadius: 12,
-          background: "#fff",
-          border: "1px solid #f0f0f0",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-        }}>
+        <div
+          style={{
+            marginBottom: 24,
+            padding: 16,
+            borderRadius: 12,
+            background: "#fff",
+            border: "1px solid #f0f0f0",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          }}
+        >
           <textarea
             value={newContent}
             onChange={(e) => setNewContent(e.target.value)}
@@ -307,8 +336,7 @@ export default function HomePage() {
               border: "none",
               background: newContent.trim() && !posting ? "#667eea" : "#ccc",
               color: "#fff",
-              cursor:
-                newContent.trim() && !posting ? "pointer" : "not-allowed",
+              cursor: newContent.trim() && !posting ? "pointer" : "not-allowed",
               fontWeight: 600,
               fontSize: 14,
               transition: "all 0.2s",
@@ -330,12 +358,14 @@ export default function HomePage() {
 
         <div style={{ display: "grid", gap: 14 }}>
           {posts.length === 0 && !loading ? (
-            <div style={{
-              padding: 32,
-              textAlign: "center",
-              color: "#999",
-              fontSize: 14,
-            }}>
+            <div
+              style={{
+                padding: 32,
+                textAlign: "center",
+                color: "#999",
+                fontSize: 14,
+              }}
+            >
               No posts yet. Be the first to share! 🚀
             </div>
           ) : (

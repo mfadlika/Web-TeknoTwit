@@ -1,0 +1,114 @@
+/* Login Page Styles */
+:root {
+  --tint: #61dafb;
+  --text-strong: #030000ff;
+  --border: #e0e0e0;
+  --bg-input: #f5f5f5;
+  --error: #b00020;
+  --success: #007700;
+}
+
+.login-container {
+  max-width: 520px;
+  margin: 48px auto;
+  padding: 24px;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-title {
+  margin: 0;
+}
+
+.login-subtitle {
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+.login-form {
+  display: grid;
+  gap: 16px;
+}
+
+.login-field {
+  display: grid;
+  gap: 8px;
+}
+
+.login-label {
+  font-weight: 600;
+}
+
+.login-input {
+  height: 48px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-input);
+  width: 100%;
+}
+
+.login-input-row {
+  display: flex;
+  align-items: center;
+}
+
+.login-domain {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-input);
+  margin-left: 8px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.login-button {
+  height: 48px;
+  border-radius: 12px;
+  border: none;
+  background: var(--tint);
+  color: var(--text-strong);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-link-button {
+  background: none;
+  border: none;
+  color: var(--tint);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.login-feedback {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.login-error {
+  color: var(--error);
+}
+
+.login-success {
+  color: var(--success);
+}
+
+.login-footer {
+  margin-top: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-signup-link {
+  color: var(--tint);
+  font-weight: 600;
+  margin-left: 4px;
+}

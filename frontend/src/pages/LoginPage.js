@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./LoginPage.css";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -23,7 +24,6 @@ export default function LoginPage() {
     try {
       const normalizedUsername = String(username).trim();
 
-      // Keep backend compatibility: login expects username, not email
       const res = await fetch("http://localhost:3000/api/user/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,95 +55,46 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ maxWidth: 520, margin: "48px auto", padding: 24 }}>
-      <div style={{ textAlign: "center", marginBottom: 32 }}>
-        <h2 style={{ margin: 0 }}>Welcome Back</h2>
-        <p style={{ marginTop: 8, opacity: 0.7 }}>Sign in to continue</p>
+    <div className="login-container">
+      <div className="login-header">
+        <h2 className="login-title">Welcome Back</h2>
+        <p className="login-subtitle">Sign in to continue</p>
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 16 }}>
-        <div style={{ display: "grid", gap: 8 }}>
-          <label style={{ fontWeight: 600 }}>Username</label>
-          <div style={{ display: "flex", alignItems: "center" }}>
+      <form onSubmit={handleSubmit} className="login-form">
+        <div className="login-field">
+          <label className="login-label">Username</label>
+          <div className="login-input-row">
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              style={{
-                flex: 1,
-                height: 48,
-                padding: "0 12px",
-                border: "1px solid #e0e0e0",
-                borderRadius: 12,
-                background: "#f5f5f5",
-              }}
+              className="login-input"
               placeholder="Enter your username"
-              autoCapitalize="none"
-              autoCorrect="off"
             />
-            <div
-              style={{
-                height: 48,
-                display: "flex",
-                alignItems: "center",
-                padding: "0 12px",
-                border: "1px solid #e0e0e0",
-                borderRadius: 12,
-                background: "#f5f5f5",
-                marginLeft: 8,
-                whiteSpace: "nowrap",
-              }}
-            >
-              <span style={{ fontWeight: 600 }}>{EMAIL_DOMAIN}</span>
-            </div>
+            <div className="login-domain">{EMAIL_DOMAIN}</div>
           </div>
         </div>
 
-        <div style={{ display: "grid", gap: 8 }}>
-          <label style={{ fontWeight: 600 }}>Password</label>
+        <div className="login-field">
+          <label className="login-label">Password</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={{
-              height: 48,
-              padding: "0 12px",
-              border: "1px solid #e0e0e0",
-              borderRadius: 12,
-              background: "#f5f5f5",
-            }}
+            className="login-input"
             placeholder="Enter your password"
-            autoCapitalize="none"
-            autoCorrect="off"
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          style={{
-            height: 48,
-            borderRadius: 12,
-            border: "none",
-            background: "#61dafb",
-            color: "#030000ff",
-            fontWeight: 600,
-            cursor: "pointer",
-          }}
-        >
+        <button type="submit" disabled={isLoading} className="login-button">
           {isLoading ? "Signing in..." : "Sign In"}
         </button>
 
-        <div style={{ textAlign: "center" }}>
+        <div className="login-header">
           <button
             type="button"
-            style={{
-              background: "none",
-              border: "none",
-              color: "#61dafb",
-              fontWeight: 500,
-              cursor: "pointer",
-            }}
+            className="login-link-button"
             onClick={() => alert("Forgot Password flow coming soon")}
           >
             Forgot Password?
@@ -151,20 +102,12 @@ export default function LoginPage() {
         </div>
       </form>
 
-      {error && (
-        <div style={{ marginTop: 12, color: "#b00020", textAlign: "center" }}>
-          {error}
-        </div>
-      )}
-      {success && (
-        <div style={{ marginTop: 12, color: "#007700", textAlign: "center" }}>
-          {success}
-        </div>
-      )}
+      {error && <div className="login-feedback login-error">{error}</div>}
+      {success && <div className="login-feedback login-success">{success}</div>}
 
-      <div style={{ marginTop: 32, display: "flex", justifyContent: "center" }}>
-        <span>Don9t have an account?&nbsp;</span>
-        <a href="/signup" style={{ color: "#61dafb", fontWeight: 600 }}>
+      <div className="login-footer">
+        <span>Don't have an account?</span>
+        <a href="/signup" className="login-signup-link">
           Sign Up
         </a>
       </div>

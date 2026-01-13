@@ -108,3 +108,24 @@ exports.getFollowing = async (req, res) => {
   }
 };
 
+exports.checkFollowStatus = async (req, res) => {
+  try {
+    const followerId = getAuthUserId(req);
+    const followingId = Number(req.params.userId);
+
+    if (!followerId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    if (!followingId) {
+      return res.status(400).json({ message: "Invalid user" });
+    }
+
+    const existing = await prisma.follow.findUnique({
+      where: { followerId_followingId: { followerId, followingId } },
+    });
+
+    res.json({ isFollowing: !!existing });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

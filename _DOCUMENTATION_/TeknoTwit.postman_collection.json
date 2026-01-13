@@ -1,0 +1,323 @@
+{
+  "info": {
+    "name": "TeknoTwit API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "userId", "value": "1" },
+    { "key": "otherUserId", "value": "2" },
+    { "key": "username", "value": "user1" },
+    { "key": "password", "value": "password1" },
+    { "key": "email", "value": "user1@teknokrat.ac.id" },
+    { "key": "postId", "value": "1" },
+    { "key": "friendRequestId", "value": "1" },
+    { "key": "friendshipId", "value": "1" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Users",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/user"
+          }
+        },
+        {
+          "name": "Get User By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/user/{{userId}}"
+          }
+        },
+        {
+          "name": "Get User By Username",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/user/username/{{username}}"
+          }
+        },
+        {
+          "name": "Sign Up",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"User One\",\n  \"username\": \"{{username}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/user/signup"
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/user/login"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/user/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Get Posts",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/post"
+          }
+        },
+        {
+          "name": "Get Post By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/post/{{postId}}"
+          }
+        },
+        {
+          "name": "Get Posts By User",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/post/user/{{userId}}"
+          }
+        },
+        {
+          "name": "Create Post",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Hello World\",\n  \"content\": \"First post content\"\n}"
+            },
+            "url": "{{baseUrl}}/api/post"
+          }
+        },
+        {
+          "name": "Create Picture Post",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Picture Post\",\n  \"content\": \"Caption for picture\",\n  \"imageUrl\": \"https://example.com/image.jpg\"\n}"
+            },
+            "url": "{{baseUrl}}/api/post/picture"
+          }
+        },
+        {
+          "name": "Like Post",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/post/{{postId}}/like"
+          }
+        },
+        {
+          "name": "Repost Post",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/post/{{postId}}/repost"
+          }
+        },
+        {
+          "name": "Undo Repost",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/post/{{postId}}/repost"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Friends",
+      "item": [
+        {
+          "name": "Send Friend Request",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"addresseeId\": {{otherUserId}}\n}"
+            },
+            "url": "{{baseUrl}}/api/friend/request"
+          }
+        },
+        {
+          "name": "Get Pending Requests",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/friend/requests"
+          }
+        },
+        {
+          "name": "Respond To Request",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACCEPTED\"\n}"
+            },
+            "url": "{{baseUrl}}/api/friend/requests/{{friendRequestId}}"
+          }
+        },
+        {
+          "name": "Get Friends",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/friend"
+          }
+        },
+        {
+          "name": "Remove Friend",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/friend/{{friendshipId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Follow",
+      "item": [
+        {
+          "name": "Follow User",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/follow/follow/{{otherUserId}}"
+          }
+        },
+        {
+          "name": "Unfollow User",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/follow/unfollow/{{otherUserId}}"
+          }
+        },
+        {
+          "name": "Get Followers",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/follow/followers/{{userId}}"
+          }
+        },
+        {
+          "name": "Get Following",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/follow/following/{{userId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Get Profile By UserId",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/profile/{{userId}}"
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Hello from TeknoTwit\",\n  \"avatarUrl\": \"https://example.com/avatar.jpg\"\n}"
+            },
+            "url": "{{baseUrl}}/api/profile/{{userId}}"
+          }
+        },
+        {
+          "name": "Delete Profile",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/profile/{{userId}}"
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/profile/me/profile"
+          }
+        },
+        {
+          "name": "Delete My Profile",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/profile/me/profile"
+          }
+        },
+        {
+          "name": "Send Direct Message",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverId\": {{otherUserId}},\n  \"content\": \"Hi from profile DM\"\n}"
+            },
+            "url": "{{baseUrl}}/api/profile/dm"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Share",
+      "item": [
+        {
+          "name": "Send Direct Message",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverId\": {{otherUserId}},\n  \"content\": \"Hi from share DM\"\n}"
+            },
+            "url": "{{baseUrl}}/api/share/dm"
+          }
+        },
+        {
+          "name": "Get Direct Messages",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/share/dm?withUserId={{otherUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "share", "dm"],
+              "query": [
+                { "key": "withUserId", "value": "{{otherUserId}}" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

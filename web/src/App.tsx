@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, MouseEvent } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -13,8 +13,12 @@ import UserPage from "./pages/UserPage";
 
 function NavBar() {
   const navigate = useNavigate();
-  const [token, setToken] = useState(localStorage.getItem("token"));
-  const [userId, setUserId] = useState(localStorage.getItem("userId"));
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem("token")
+  );
+  const [userId, setUserId] = useState<string | null>(
+    localStorage.getItem("userId")
+  );
 
   useEffect(() => {
     const handler = () => {
@@ -25,7 +29,7 @@ function NavBar() {
     return () => window.removeEventListener("app:auth-changed", handler);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     window.dispatchEvent(new Event("app:auth-changed"));
@@ -82,10 +86,10 @@ function NavBar() {
                   borderRadius: 6,
                   transition: "all 0.2s",
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={(e: MouseEvent<HTMLAnchorElement>) => {
                   e.currentTarget.style.background = "#f0f0f0";
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={(e: MouseEvent<HTMLAnchorElement>) => {
                   e.currentTarget.style.background = "transparent";
                 }}
               >
@@ -102,10 +106,10 @@ function NavBar() {
                   borderRadius: 6,
                   transition: "all 0.2s",
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={(e: MouseEvent<HTMLAnchorElement>) => {
                   e.currentTarget.style.background = "#f0f0f0";
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={(e: MouseEvent<HTMLAnchorElement>) => {
                   e.currentTarget.style.background = "transparent";
                 }}
               >
@@ -124,11 +128,11 @@ function NavBar() {
                   cursor: "pointer",
                   transition: "all 0.2s",
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
                   e.currentTarget.style.background = "#667eea";
                   e.currentTarget.style.color = "#fff";
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
                   e.currentTarget.style.background = "transparent";
                   e.currentTarget.style.color = "#667eea";
                 }}
@@ -149,10 +153,10 @@ function NavBar() {
                   borderRadius: 6,
                   transition: "all 0.2s",
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={(e: MouseEvent<HTMLAnchorElement>) => {
                   e.currentTarget.style.background = "#f0f0f0";
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={(e: MouseEvent<HTMLAnchorElement>) => {
                   e.currentTarget.style.background = "transparent";
                 }}
               >
@@ -170,10 +174,10 @@ function NavBar() {
                   background: "#667eea",
                   transition: "all 0.2s",
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={(e: MouseEvent<HTMLAnchorElement>) => {
                   e.currentTarget.style.background = "#5568d3";
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={(e: MouseEvent<HTMLAnchorElement>) => {
                   e.currentTarget.style.background = "#667eea";
                 }}
               >

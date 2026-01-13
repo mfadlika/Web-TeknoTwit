@@ -346,7 +346,7 @@ export default function HomePage() {
                 const res = await axios.post(`${API_BASE}/post`, body, {
                   headers: { Authorization: `Bearer ${token}` },
                 });
-                // API returns { message, post }
+       
                 const created =
                   res.data && res.data.post ? res.data.post : null;
                 if (created) {
@@ -470,7 +470,7 @@ export default function HomePage() {
                     );
                   } catch (err) {
                     if (err.response && err.response.status === 409) {
-                      // already liked, toggle to unlike
+         
                       try {
                         const token = localStorage.getItem("token");
                         const unlikeUrl = `${API_BASE}/post/${post.id}/like`;

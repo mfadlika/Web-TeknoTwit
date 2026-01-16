@@ -36,25 +36,24 @@ export const getProfile = async (req: Request, res: Response) => {
 
 // PUT update profile (authenticated)
 export const updateProfile = async (req: Request, res: Response) => {
-    try {
-        const authUserId = req.user && req.user.id ? Number(req.user.id) : null;
-        const userId = parseInt(req.params.userId);
-        
-        if (authUserId !== userId) {
-            return res.status(403).json({ message: "Forbidden" });
-        }
-        const { bio, avatarUrl } = req.body;
-        
-        const updatedUser = await prisma.user.update({
-            where: { id: userId },
-        data: { bio, avatarUrl } as any,
-        });
-        
-        res.json(updatedUser);
-    } catch (err) {
-        res.status(500).json({ error: err.message });   
-      
+  try {
+    const authUserId = req.user && req.user.id ? Number(req.user.id) : null;
+    const userId = parseInt(req.params.userId);
+
+    if (authUserId !== userId) {
+      return res.status(403).json({ message: "Forbidden" });
     }
+    const { bio, avatarUrl } = req.body;
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { bio, avatarUrl } as any,
+    });
+
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 // DELETE profile (authenticated)
@@ -152,9 +151,7 @@ export const sendDirectMessage = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid receiver" });
     }
     if (!content && !postId) {
-      return res
-        .status(400)
-        .json({ message: "Message or postId is required" });
+      return res.status(400).json({ message: "Message or postId is required" });
     }
 
     const receiver = await prisma.user.findUnique({

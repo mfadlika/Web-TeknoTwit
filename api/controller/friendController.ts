@@ -38,9 +38,7 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
       },
     });
     if (existing) {
-      return res
-        .status(409)
-        .json({ message: "Friend request already exists" });
+      return res.status(409).json({ message: "Friend request already exists" });
     }
 
     const request = await prisma.friendship.create({

@@ -36,9 +36,7 @@ export const sendDirectMessage = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid receiver" });
     }
     if (!content && !postId) {
-      return res
-        .status(400)
-        .json({ message: "Message or postId is required" });
+      return res.status(400).json({ message: "Message or postId is required" });
     }
 
     const receiver = await prisma.user.findUnique({

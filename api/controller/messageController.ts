@@ -12,7 +12,8 @@ export const sendMessage = async (req: Request, res: Response) => {
   try {
     const senderId = getAuthUserId(req);
     const receiverId = Number(req.body.receiverId);
-    const content = typeof req.body.content === "string" ? req.body.content : null;
+    const content =
+      typeof req.body.content === "string" ? req.body.content : null;
 
     if (!senderId) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -73,9 +74,12 @@ export const getMessages = async (req: Request, res: Response) => {
   }
 };
 
-export const sendDirectMessageWithPost = async (req: Request, res: Response) => {
+export const sendDirectMessageWithPost = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const senderId = getAuthUserId(req);    
+    const senderId = getAuthUserId(req);
     const receiverId = Number(req.body.receiverId);
     const content =
       typeof req.body.content === "string" ? req.body.content : null;
@@ -88,9 +92,7 @@ export const sendDirectMessageWithPost = async (req: Request, res: Response) => 
       return res.status(400).json({ message: "Invalid receiver" });
     }
     if (!content && !postId) {
-      return res
-        .status(400)
-        .json({ message: "Message or postId is required" });
+      return res.status(400).json({ message: "Message or postId is required" });
     }
     if (postId) {
       const post = await prisma.post.findUnique({ where: { id: postId } });
@@ -177,7 +179,7 @@ export const editMessage = async (req: Request, res: Response) => {
     });
 
     res.json({ message: "Message updated", data: updatedMessage });
-    } catch (err) {
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };

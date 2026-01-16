@@ -1,9 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
-function PostCard({ post }) {
-  const cardStyle = {
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+interface Post {
+  id: number;
+  content: string;
+  likes: number;
+  createdAt?: string;
+  created_at?: string;
+  user?: {
+    id: number;
+    name: string;
+  };
+}
+
+interface PostCardProps {
+  post: Post;
+}
+
+interface FollowResponse {
+  id: number;
+  following: {
+    id: number;
+  };
+}
+
+function PostCard({ post }: PostCardProps) {
+  const cardStyle: React.CSSProperties = {
     padding: 16,
     borderRadius: 12,
     border: "1px solid #f0f0f0",
@@ -12,7 +41,7 @@ function PostCard({ post }) {
     transition: "box-shadow 0.2s, border-color 0.2s",
   };
 
-  const avatarStyle = {
+  const avatarStyle: React.CSSProperties = {
     width: 48,
     height: 48,
     borderRadius: "50%",
@@ -30,12 +59,14 @@ function PostCard({ post }) {
     <div
       style={cardStyle}
       onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.12)";
-        e.currentTarget.style.borderColor = "#e8e8e8";
+        const target = e.currentTarget as HTMLDivElement;
+        target.style.boxShadow = "0 4px 12px rgba(0,0,0,0.12)";
+        target.style.borderColor = "#e8e8e8";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
-        e.currentTarget.style.borderColor = "#f0f0f0";
+        const target = e.currentTarget as HTMLDivElement;
+        target.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
+        target.style.borderColor = "#f0f0f0";
       }}
     >
       <div style={{ display: "flex", gap: 14 }}>
@@ -55,7 +86,9 @@ function PostCard({ post }) {
               {post.user?.name || "Unknown"}
             </div>
             <div style={{ color: "#999", fontSize: 13, marginLeft: "auto" }}>
-              {new Date(post.createdAt || post.created_at).toLocaleString()}
+              {new Date(
+                post.createdAt || post.created_at || ""
+              ).toLocaleString()}
             </div>
           </div>
           <div
@@ -85,13 +118,13 @@ function PostCard({ post }) {
 }
 
 export default function UserPage() {
-  const { id } = useParams();
-  const [posts, setPosts] = useState([]);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [followLoading, setFollowLoading] = useState(false);
+  const { id } = useParams<{ id: string }>();
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [followLoading, setFollowLoading] = useState<boolean>(false);
 
   const API_BASE =
     process.env.REACT_APP_API_BASE || "http://localhost:3000/api";
@@ -105,8 +138,8 @@ export default function UserPage() {
       setError(null);
       try {
         const [userRes, postsRes] = await Promise.all([
-          axios.get(`${API_BASE}/user/${id}`),
-          axios.get(`${API_BASE}/post/user/${id}`),
+          axios.get<User>(`${API_BASE}/user/${id}`),
+          axios.get<Post[]>(`${API_BASE}/post/user/${id}`),
         ]);
 
         if (!mounted) return;
@@ -121,7 +154,9 @@ export default function UserPage() {
     }
 
     load();
-    return () => (mounted = false);
+    return () => {
+      mounted = false;
+    };
   }, [id, API_BASE]);
 
   useEffect(() => {
@@ -133,7 +168,7 @@ export default function UserPage() {
       }
 
       try {
-        const res = await axios.get(
+        const res = await axios.get<FollowResponse[]>(
           `${API_BASE}/follow/following/${currentUserId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -151,7 +186,9 @@ export default function UserPage() {
     }
 
     checkFollowing();
-    return () => (mounted = false);
+    return () => {
+      mounted = false;
+    };
   }, [id, currentUserId, token, API_BASE]);
 
   const handleFollow = async () => {
@@ -167,7 +204,8 @@ export default function UserPage() {
       );
       setIsFollowing(true);
     } catch (err) {
-      if (err.response?.status === 409) {
+      const axiosErr = err as AxiosError;
+      if (axiosErr.response?.status === 409) {
         setIsFollowing(true);
       } else {
         console.error("Failed to follow:", err);
@@ -190,7 +228,8 @@ export default function UserPage() {
       );
       setIsFollowing(false);
     } catch (err) {
-      if (err.response?.status === 404) {
+      const axiosErr = err as AxiosError;
+      if (axiosErr.response?.status === 404) {
         setIsFollowing(false);
       } else {
         console.error("Failed to unfollow:", err);
@@ -221,10 +260,12 @@ export default function UserPage() {
             display: "inline-block",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.textDecoration = "underline";
+            (e.currentTarget as HTMLAnchorElement).style.textDecoration =
+              "underline";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.textDecoration = "none";
+            (e.currentTarget as HTMLAnchorElement).style.textDecoration =
+              "none";
           }}
         >
           ← Back to Home
@@ -328,18 +369,20 @@ export default function UserPage() {
                         opacity: followLoading ? 0.7 : 1,
                       }}
                       onMouseEnter={(e) => {
+                        const target = e.currentTarget as HTMLButtonElement;
                         if (!followLoading) {
-                          e.currentTarget.style.background = isFollowing
+                          target.style.background = isFollowing
                             ? "#e0e0e0"
                             : "#5568d3";
-                          e.currentTarget.style.transform = "translateY(-1px)";
+                          target.style.transform = "translateY(-1px)";
                         }
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.background = isFollowing
+                        const target = e.currentTarget as HTMLButtonElement;
+                        target.style.background = isFollowing
                           ? "#f0f0f0"
                           : "#667eea";
-                        e.currentTarget.style.transform = "translateY(0)";
+                        target.style.transform = "translateY(0)";
                       }}
                     >
                       {followLoading

@@ -1,17 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, FormEvent, ChangeEvent } from "react";
 import "./SignupPage.css";
 
+interface SignupResponse {
+  message?: string;
+  error?: string;
+}
+
 export default function SignupPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const EMAIL_DOMAIN = "@teknokrat.ac.id";
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
@@ -55,7 +60,7 @@ export default function SignupPage() {
         }),
       });
 
-      const data = await res.json();
+      const data: SignupResponse = await res.json();
       if (!res.ok) {
         setError(data.message || data.error || "Signup failed");
         setIsLoading(false);
@@ -67,7 +72,7 @@ export default function SignupPage() {
         window.location.href = "/login";
       }, 800);
     } catch (err) {
-      setError(err.message || "Network error");
+      setError(err instanceof Error ? err.message : "Network error");
     } finally {
       setIsLoading(false);
     }
@@ -87,7 +92,9 @@ export default function SignupPage() {
             <input
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setUsername(e.target.value)
+              }
               className="signup-input"
               placeholder="Choose a username"
             />
@@ -100,7 +107,9 @@ export default function SignupPage() {
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setPassword(e.target.value)
+            }
             className="signup-input"
             placeholder="Create a password"
           />
@@ -111,7 +120,9 @@ export default function SignupPage() {
           <input
             type="password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setConfirmPassword(e.target.value)
+            }
             className="signup-input"
             placeholder="Re-enter your password"
           />

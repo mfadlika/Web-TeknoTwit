@@ -1,11 +1,13 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from "@prisma/client";
+import type { Request, Response } from "express";
+
 const prisma = new PrismaClient();
 
-function getAuthUserId(req) {
+function getAuthUserId(req: Request): number | null {
   return req.user && req.user.id ? Number(req.user.id) : null;
 }
 
-async function areFriends(userId, otherUserId) {
+async function areFriends(userId: number, otherUserId: number) {
   const friendship = await prisma.friendship.findFirst({
     where: {
       status: "ACCEPTED",
@@ -18,7 +20,7 @@ async function areFriends(userId, otherUserId) {
   return Boolean(friendship);
 }
 
-exports.sendDirectMessage = async (req, res) => {
+export const sendDirectMessage = async (req: Request, res: Response) => {
   try {
     const senderId = getAuthUserId(req);
     const receiverId = Number(req.body.receiverId);
@@ -72,7 +74,7 @@ exports.sendDirectMessage = async (req, res) => {
   }
 };
 
-exports.getDirectMessages = async (req, res) => {
+export const getDirectMessages = async (req: Request, res: Response) => {
   try {
     const userId = getAuthUserId(req);
     const withUserId = req.query.withUserId

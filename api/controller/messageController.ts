@@ -1,12 +1,13 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from "@prisma/client";
+import type { Request, Response } from "express";
+
 const prisma = new PrismaClient();
 
-function getAuthUserId(req) {
+function getAuthUserId(req: Request): number | null {
   return req.user && req.user.id ? Number(req.user.id) : null;
 }
 
-
-exports.sendMessage = async (req, res) => {
+export const sendMessage = async (req: Request, res: Response) => {
   try {
     const senderId = getAuthUserId(req);
     const receiverId = Number(req.body.receiverId);
@@ -43,7 +44,7 @@ exports.sendMessage = async (req, res) => {
   }
 };
 
-exports.getMessages = async (req, res) => {
+export const getMessages = async (req: Request, res: Response) => {
   try {
     const userId = getAuthUserId(req);
     const otherUserId = Number(req.query.userId);
@@ -71,7 +72,7 @@ exports.getMessages = async (req, res) => {
   }
 };
 
-exports.sendDirectMessageWithPost = async (req, res) => {
+export const sendDirectMessageWithPost = async (req: Request, res: Response) => {
   try {
     const senderId = getAuthUserId(req);    
     const receiverId = Number(req.body.receiverId);
@@ -112,7 +113,7 @@ exports.sendDirectMessageWithPost = async (req, res) => {
   }
 };
 
-exports.deleteMessage = async (req, res) => {
+export const deleteMessage = async (req: Request, res: Response) => {
   try {
     const userId = getAuthUserId(req);
     const messageId = Number(req.params.id);
@@ -142,7 +143,7 @@ exports.deleteMessage = async (req, res) => {
   }
 };
 
-exports.editMessage = async (req, res) => {
+export const editMessage = async (req: Request, res: Response) => {
   try {
     const userId = getAuthUserId(req);
     const messageId = Number(req.params.id);
@@ -179,4 +180,3 @@ exports.editMessage = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-

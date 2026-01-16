@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import type { Request, Response } from "express";

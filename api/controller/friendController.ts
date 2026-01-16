@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { PrismaClient, FriendStatus } from "@prisma/client";
 import type { Request, Response } from "express";
 

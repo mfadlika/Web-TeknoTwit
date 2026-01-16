@@ -1,4 +1,8 @@
-import express, { type NextFunction, type Request, type Response } from "express";
+import express, {
+  type NextFunction,
+  type Request,
+  type Response,
+} from "express";
 import path from "path";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -8,8 +12,8 @@ import friendRouter from "./routers/friendRouter";
 import shareRouter from "./routers/shareRouter";
 import followRouter from "./routers/followRouter";
 import profileRouter from "./routers/profileRouter";
+import "dotenv/config";
 
-dotenv.config({ path: path.join(__dirname, ".env") });
 
 const app = express();
 

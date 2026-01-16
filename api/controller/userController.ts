@@ -1,8 +1,9 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from "@prisma/client";
+import type { Request, Response } from "express";
 const prisma = new PrismaClient();
 
 // GET all users
-exports.getUsers = async (req, res) => {
+export const getUsers = async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany();
     res.json(users);
@@ -12,7 +13,7 @@ exports.getUsers = async (req, res) => {
 };
 
 // GET user by ID
-exports.getUser = async (req, res) => {
+export const getUser = async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
 
@@ -31,7 +32,7 @@ exports.getUser = async (req, res) => {
 };
 
 // GET user by username
-exports.getUserByUsername = async (req, res) => {
+export const getUserByUsername = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
 
@@ -50,7 +51,7 @@ exports.getUserByUsername = async (req, res) => {
 };
 
 // Get user by ID delete user
-exports.deleteUser = async (req, res) => {
+export const deleteUser = async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
 

@@ -1,8 +1,10 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from "@prisma/client";
+import type { Request, Response } from "express";
+
 const prisma = new PrismaClient();
 
 // GET all posts
-exports.getPosts = async (req, res) => {
+export const getPosts = async (req: Request, res: Response) => {
   try {
     const posts = await prisma.post.findMany({
       orderBy: { createdAt: "desc" },
@@ -45,7 +47,7 @@ exports.getPosts = async (req, res) => {
 };
 
 // GET post by ID
-exports.getPost = async (req, res) => {
+export const getPost = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
 
@@ -64,7 +66,7 @@ exports.getPost = async (req, res) => {
 };
 
 // GET posts by user ID
-exports.getPostsByUser = async (req, res) => {
+export const getPostsByUser = async (req: Request, res: Response) => {
   try {
     const userId = Number(req.params.userId);
 
@@ -84,7 +86,7 @@ exports.getPostsByUser = async (req, res) => {
 };
 
 // GET posts from followed users (authenticated)
-exports.getFollowingPosts = async (req, res) => {
+export const getFollowingPosts = async (req: Request, res: Response) => {
   try {
     const followerId = req.user && req.user.id ? Number(req.user.id) : null;
 
@@ -143,7 +145,7 @@ exports.getFollowingPosts = async (req, res) => {
 };
 
 // CREATE new post (authenticated)
-exports.createPost = async (req, res) => {
+export const createPost = async (req: Request, res: Response) => {
   try {
     const { title, content } = req.body;
     // prefer authenticated user id from middleware
@@ -180,7 +182,7 @@ exports.createPost = async (req, res) => {
 };
 
 //  Create Picture Post (authenticated)
-exports.createPosture = async (req, res) => {
+export const createPosture = async (req: Request, res: Response) => {
   try {
     const { title, content, imageUrl } = req.body;
     // prefer authenticated user id from middleware
@@ -216,10 +218,10 @@ exports.createPosture = async (req, res) => {
   }
 };
 
-exports.createPostpicture = exports.createPosture;
+export const createPostpicture = createPosture;
 
 // Repost a post (authenticated)
-exports.repostPost = async (req, res) => {
+export const repostPost = async (req: Request, res: Response) => {
   try {
     const postId = Number(req.params.id);
     const userId = req.user && req.user.id ? Number(req.user.id) : null;
@@ -254,7 +256,7 @@ exports.repostPost = async (req, res) => {
 };
 
 // Undo repost (authenticated)
-exports.unrepostPost = async (req, res) => {
+export const unrepostPost = async (req: Request, res: Response) => {
   try {
     const postId = Number(req.params.id);
     const userId = req.user && req.user.id ? Number(req.user.id) : null;
@@ -283,7 +285,7 @@ exports.unrepostPost = async (req, res) => {
   }
 };
 
-exports.likePost = async (req, res) => {
+export const likePost = async (req: Request, res: Response) => {
   try {
     const postId = Number(req.params.id);
     const userId = req.user && req.user.id ? Number(req.user.id) : null;
@@ -317,7 +319,7 @@ exports.likePost = async (req, res) => {
   }
 };
 
-exports.unlikePost = async (req, res) => {
+export const unlikePost = async (req: Request, res: Response) => {
   try {
     const postId = Number(req.params.id);
     const userId = req.user && req.user.id ? Number(req.user.id) : null;

@@ -12,7 +12,7 @@ import friendRouter from "./routers/friendRouter";
 import shareRouter from "./routers/shareRouter";
 import followRouter from "./routers/followRouter";
 import profileRouter from "./routers/profileRouter";
-import "dotenv/config";
+import messageRouter from "./routers/messageRouter";
 
 
 const app = express();
@@ -36,6 +36,7 @@ app.use("/api/friend", friendRouter);
 app.use("/api/share", shareRouter);
 app.use("/api/follow", followRouter);
 app.use("/api/profile", profileRouter);
+app.use("/api/message", messageRouter);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send({ message: err.message });
